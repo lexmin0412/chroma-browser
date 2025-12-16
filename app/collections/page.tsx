@@ -191,7 +191,7 @@ export default function CollectionsPage() {
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
-                  Collections
+                  ChromaDB Browser
                 </h1>
                 <p className="text-slate-600 dark:text-slate-400 text-lg">
                   Manage your ChromaDB vector collections
@@ -200,13 +200,13 @@ export default function CollectionsPage() {
               <div className="flex gap-3">
                 <button
                   onClick={openSettingsModal}
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                  className="inline-flex items-center px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
                 >
                   ⚙️ Settings
                 </button>
                 <button
                   onClick={openCreateDrawer}
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                  className="inline-flex items-center px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
                 >
                   ✨ New Collection
                 </button>
