@@ -182,122 +182,140 @@ export default function CollectionsPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* 主内容区 */}
-      <main className="flex-1 p-8 overflow-auto">
-        {/* 顶部导航 */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
-                Collections
-              </h2>
-              <p className="text-gray-500 dark:text-gray-400 mt-1">
-                Manage your Chroma DB collections
-              </p>
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto p-6 md:p-8">
+          {/* 顶部导航 */}
+          <div className="mb-8">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+                  Collections
+                </h1>
+                <p className="text-slate-600 dark:text-slate-400 text-lg">
+                  Manage your ChromaDB vector collections
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={openSettingsModal}
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                >
+                  ⚙️ Settings
+                </button>
+                <button
+                  onClick={openCreateDrawer}
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                >
+                  ✨ New Collection
+                </button>
+                <Link
+                  href="/server"
+                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                >
+                  📊 Server Status
+                </Link>
+              </div>
             </div>
-            <div className="flex space-x-4">
-              <button
-                onClick={openSettingsModal}
-                className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
-              >
-                Settings
-              </button>
-              <button
-                onClick={openCreateDrawer}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
-              >
-                Create Collection
-              </button>
-              <Link
-                href="/server"
-                className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
-              >
-                Server Status
-              </Link>
-            </div>
+
+            {/* 通知提示 */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 animate-fade-in">
+                <strong className="font-semibold">⚠️ Error: </strong>
+                <span>{error}</span>
+              </div>
+            )}
+            {success && (
+              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 animate-fade-in">
+                <strong className="font-semibold">✓ Success: </strong>
+                <span>{success}</span>
+              </div>
+            )}
           </div>
 
-          {/* 通知提示 */}
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-              <strong className="font-bold">Error: </strong>
-              <span>{error}</span>
+          {/* 集合列表卡片 */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            {/* 头部 */}
+            <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-gradient-to-r from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/50">
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Existing Collections</h2>
+              <button
+                onClick={fetchCollections}
+                disabled={loading}
+                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <LoadingSpinner size="sm" />
+                    <span>Refreshing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>🔄</span>
+                    <span>Refresh</span>
+                  </>
+                )}
+              </button>
             </div>
-          )}
-          {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-              <strong className="font-bold">Success: </strong>
-              <span>{success}</span>
-            </div>
-          )}
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            {/* 集合列表 */}
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Existing Collections</h3>
-                <button
-                  onClick={fetchCollections}
-                  disabled={loading}
-                  className="flex items-center text-sm bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-md disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <>
-                      <div className="mr-1">
-                        <LoadingSpinner size="sm" />
-                      </div>
-                      Refreshing...
-                    </>
-                  ) : (
-                    'Refresh'
-                  )}
-                </button>
-              </div>
-
+            {/* 内容 */}
+            <div className="p-6">
               {loading ? (
-                <div className="flex justify-center py-8">
+                <div className="flex justify-center py-12">
                   <LoadingSpinner message="Loading collections..." />
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {collections.map((collection) => (
-                    <div key={collection.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-semibold text-gray-800 dark:text-white">{collection.name}</h4>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            ID: {collection.id?.substring(0, 8)}...
-                          </div>
+                    <div key={collection.id} className="group relative bg-gradient-to-br from-slate-50 to-white dark:from-slate-700/50 dark:to-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-5 hover:shadow-md transition-all hover:border-sky-300 dark:hover:border-violet-600 dark:border-violet-400 duration-200">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">{collection.name}</h3>
+                          <code className="text-xs text-slate-500 dark:text-slate-400 font-mono break-all">
+                            {collection.id?.substring(0, 12)}...
+                          </code>
                         </div>
                         <button
                           onClick={() => deleteCollection(collection.name)}
-                          className="text-red-500 hover:text-red-700"
+                          className="opacity-0 group-hover:opacity-100 flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/40 transition-all"
                           title="Delete collection"
                         >
                           ✕
                         </button>
                       </div>
-                      {collection.metadata && (
-                        <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                          {Object.entries(collection.metadata).map(([key, value]) => (
-                            <div key={key}>{key}: {JSON.stringify(value)}</div>
-                          ))}
+                      {collection.metadata && Object.keys(collection.metadata).length > 0 && (
+                        <div className="mb-4 py-3 px-3 bg-slate-100 dark:bg-slate-900/30 rounded border border-slate-200 dark:border-slate-700/50">
+                          <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">Metadata</div>
+                          <div className="space-y-1">
+                            {Object.entries(collection.metadata).map(([key, value]) => (
+                              <div key={key} className="text-xs text-slate-600 dark:text-slate-300">
+                                <span className="font-mono text-slate-500">{key}:</span> {JSON.stringify(value)}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
-                      <div className="mt-4 flex justify-end">
+                      <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
                         <Link
                           href={`/collection/${collection.name}`}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                          className="inline-flex items-center justify-center w-full px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-md hover:shadow-lg"
                         >
-                          Manage Records
+                          📋 Manage Records
                         </Link>
                       </div>
                     </div>
                   ))}
                   {collections.length === 0 && (
-                    <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-                      No collections found. Create your first collection!
+                    <div className="col-span-full text-center py-16">
+                      <div className="text-6xl mb-4">📚</div>
+                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">No Collections</h3>
+                      <p className="text-slate-600 dark:text-slate-400 mb-6">Create your first collection to get started</p>
+                      <button
+                        onClick={openCreateDrawer}
+                        className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                      >
+                        ✨ Create Collection
+                      </button>
                     </div>
                   )}
                 </div>
@@ -311,60 +329,61 @@ export default function CollectionsPage() {
             onClose={closeCreateDrawer}
             title="Create New Collection"
           >
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">
                   Collection Name *
                 </label>
                 <input
                   type="text"
                   value={newCollectionName}
                   onChange={(e) => setNewCollectionName(e.target.value)}
-                  placeholder="Enter collection name"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="e.g., my-documents"
+                  className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
                   disabled={creatingCollection}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">
                   Metadata (JSON, optional)
                 </label>
                 <textarea
                   value={newCollectionMetadata}
                   onChange={(e) => setNewCollectionMetadata(e.target.value)}
-                  placeholder='{"key": "value"}'
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder='{"description": "My collection", "version": "1.0"}'
+                  className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors font-mono text-sm"
                   rows={4}
                   disabled={creatingCollection}
                 />
               </div>
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg text-sm font-medium">
                   {error}
                 </div>
               )}
-              <div className="flex justify-end space-x-3 pt-4">
+              <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
                 <button
                   onClick={closeCreateDrawer}
                   disabled={creatingCollection}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-medium disabled:opacity-60"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={createCollection}
                   disabled={creatingCollection}
-                  className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md disabled:bg-blue-300 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none"
                 >
                   {creatingCollection ? (
                     <>
-                      <div className="mr-2">
-                        <LoadingSpinner size="sm" />
-                      </div>
-                      Creating...
+                      <LoadingSpinner size="sm" />
+                      <span>Creating...</span>
                     </>
                   ) : (
-                    'Create Collection'
+                    <>
+                      <span>✨</span>
+                      <span>Create Collection</span>
+                    </>
                   )}
                 </button>
               </div>

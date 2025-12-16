@@ -727,25 +727,25 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* 主内容区 */}
       <main className="flex-1 p-8 overflow-auto">
         {/* 顶部导航 */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <Link href="/collections" className="text-blue-500 hover:text-blue-700">
+            <Link href="/collections" className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 font-medium">
               ← 返回集合列表
             </Link>
             <div className="flex space-x-2">
               <button
-                onClick={openSettingsModal}
-                className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
-              >
+            onClick={openSettingsModal}
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-colors font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+          >
                 Settings
               </button>
               <Link
                 href="/server"
-                className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-colors font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
               >
                 Server Status
               </Link>
@@ -761,13 +761,13 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
 
         {/* 通知提示 */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-3 rounded-lg mb-6 shadow-sm">
             <strong className="font-bold">Error: </strong>
             <span>{error}</span>
           </div>
         )}
         {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+          <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-300 px-4 py-3 rounded-lg mb-6 shadow-sm">
             <strong className="font-bold">Success: </strong>
             <span>{success}</span>
           </div>
@@ -794,37 +794,37 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
               <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => setActiveRecordTab('add')}
-                  className={`px-4 py-2 rounded-t-lg ${activeRecordTab === 'add' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'add' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Add Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('query')}
-                  className={`px-4 py-2 rounded-t-lg ${activeRecordTab === 'query' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'query' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Query Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('get')}
-                  className={`px-4 py-2 rounded-t-lg ${activeRecordTab === 'get' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'get' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Get Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('delete')}
-                  className={`px-4 py-2 rounded-t-lg ${activeRecordTab === 'delete' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'delete' ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Delete Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('update')}
-                  className={`px-4 py-2 rounded-t-lg ${activeRecordTab === 'update' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'update' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Update Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('upsert')}
-                  className={`px-4 py-2 rounded-t-lg ${activeRecordTab === 'upsert' ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'upsert' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Upsert Records
                 </button>
@@ -847,7 +847,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={newRecordIds}
                         onChange={(e) => setNewRecordIds(e.target.value)}
                         placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={addingRecords}
                       />
                     </div>
@@ -861,7 +861,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={newRecordEmbeddings}
                         onChange={(e) => setNewRecordEmbeddings(e.target.value)}
                         placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={addingRecords}
                       />
                     </div>
@@ -875,7 +875,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={newRecordMetadatas}
                         onChange={(e) => setNewRecordMetadatas(e.target.value)}
                         placeholder='e.g., [{"name": "doc1"}, {"name": "doc2"}]'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={addingRecords}
                       />
                     </div>
@@ -889,7 +889,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={newRecordDocuments}
                         onChange={(e) => setNewRecordDocuments(e.target.value)}
                         placeholder='e.g., "Document 1", "Document 2"'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={addingRecords}
                       />
                     </div>
@@ -898,7 +898,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={addRecords}
                       disabled={addingRecords || !newRecordIds.trim()}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center"
+                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {addingRecords ? (
                         <>
@@ -925,7 +925,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={queryText}
                         onChange={(e) => setQueryText(e.target.value)}
                         placeholder='e.g., "apple", "banana"'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={queryingRecords}
                       />
                     </div>
@@ -939,7 +939,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={queryEmbedding}
                         onChange={(e) => setQueryEmbedding(e.target.value)}
                         placeholder='e.g., [0.1, 0.2, 0.3]'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={queryingRecords}
                       />
                     </div>
@@ -953,7 +953,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={queryNResults}
                         onChange={(e) => setQueryNResults(e.target.value)}
                         min="1"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={queryingRecords}
                       />
                     </div>
@@ -967,7 +967,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={queryWhere}
                         onChange={(e) => setQueryWhere(e.target.value)}
                         placeholder='e.g., {"name": "apple"}'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={queryingRecords}
                       />
                     </div>
@@ -976,7 +976,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={queryRecords}
                       disabled={queryingRecords || (!queryText.trim() && !queryEmbedding.trim())}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center"
+                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {queryingRecords ? (
                         <>
@@ -1003,7 +1003,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={getRecordIds}
                         onChange={(e) => setGetRecordIds(e.target.value)}
                         placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={fetchingRecords}
                       />
                     </div>
@@ -1017,7 +1017,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={getRecordLimit}
                         onChange={(e) => setGetRecordLimit(e.target.value)}
                         min="1"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={fetchingRecords}
                       />
                     </div>
@@ -1031,7 +1031,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={getRecordWhere}
                         onChange={(e) => setGetRecordWhere(e.target.value)}
                         placeholder='e.g., {"name": {"$eq": "apple"}}'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={fetchingRecords}
                       />
                     </div>
@@ -1040,7 +1040,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={getRecords}
                       disabled={fetchingRecords}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center"
+                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {fetchingRecords ? (
                         <>
@@ -1067,7 +1067,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={deleteRecordIds}
                         onChange={(e) => setDeleteRecordIds(e.target.value)}
                         placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={deletingRecords}
                       />
                     </div>
@@ -1081,7 +1081,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={deleteRecordWhere}
                         onChange={(e) => setDeleteRecordWhere(e.target.value)}
                         placeholder='e.g., {"name": "apple"}'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={deletingRecords}
                       />
                     </div>
@@ -1090,7 +1090,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={deleteRecords}
                       disabled={deletingRecords || (!deleteRecordIds.trim() && !deleteRecordWhere.trim())}
-                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md disabled:bg-red-300 disabled:cursor-not-allowed flex items-center"
+                      className="px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:from-red-400 disabled:to-orange-400 shadow-lg hover:shadow-xl hover:shadow-orange-500/30 disabled:shadow-none flex items-center"
                     >
                       {deletingRecords ? (
                         <>
@@ -1117,7 +1117,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={updateRecordIds}
                         onChange={(e) => setUpdateRecordIds(e.target.value)}
                         placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={updatingRecords}
                       />
                     </div>
@@ -1131,7 +1131,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={updateRecordEmbeddings}
                         onChange={(e) => setUpdateRecordEmbeddings(e.target.value)}
                         placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={updatingRecords}
                       />
                     </div>
@@ -1145,7 +1145,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={updateRecordMetadatas}
                         onChange={(e) => setUpdateRecordMetadatas(e.target.value)}
                         placeholder='e.g., [{"key1": "value1"}, {"key2": "value2"}]'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={updatingRecords}
                       />
                     </div>
@@ -1159,7 +1159,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={updateRecordDocuments}
                         onChange={(e) => setUpdateRecordDocuments(e.target.value)}
                         placeholder="e.g., document1, document2"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={updatingRecords}
                       />
                     </div>
@@ -1168,7 +1168,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={updateRecords}
                       disabled={updatingRecords || !updateRecordIds.trim()}
-                      className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-blue-300 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {updatingRecords ? (
                         <>
@@ -1195,7 +1195,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={upsertRecordIds}
                         onChange={(e) => setUpsertRecordIds(e.target.value)}
                         placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={upsertingRecords}
                       />
                     </div>
@@ -1209,7 +1209,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={upsertRecordEmbeddings}
                         onChange={(e) => setUpsertRecordEmbeddings(e.target.value)}
                         placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={upsertingRecords}
                       />
                     </div>
@@ -1223,7 +1223,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={upsertRecordMetadatas}
                         onChange={(e) => setUpsertRecordMetadatas(e.target.value)}
                         placeholder='e.g., [{"key1": "value1"}, {"key2": "value2"}]'
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={upsertingRecords}
                       />
                     </div>
@@ -1237,7 +1237,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                         value={upsertRecordDocuments}
                         onChange={(e) => setUpsertRecordDocuments(e.target.value)}
                         placeholder="e.g., document1, document2"
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
                         disabled={upsertingRecords}
                       />
                     </div>
@@ -1246,7 +1246,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={upsertRecords}
                       disabled={upsertingRecords || !upsertRecordIds.trim()}
-                      className="flex items-center bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md disabled:bg-green-300 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg font-medium transition-all disabled:from-emerald-400 disabled:to-teal-400 shadow-lg hover:shadow-xl hover:shadow-teal-500/30 disabled:shadow-none flex items-center"
                     >
                       {upsertingRecords ? (
                         <>
@@ -1263,7 +1263,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
               {records && Object.keys(records).length > 0 && (
                 <div className="mt-8">
                   <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Query Results</h4>
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 max-h-96 overflow-y-auto">
+                  <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 max-h-96 overflow-y-auto shadow-inner">
                     <pre className="text-sm text-gray-700 dark:text-gray-300">
                       {JSON.stringify(records, null, 2)}
                     </pre>

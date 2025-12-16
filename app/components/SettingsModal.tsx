@@ -68,19 +68,19 @@ export default function SettingsModal({ isOpen, onClose, onSave }: SettingsModal
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* 背景遮罩 */}
       <div
-        className="fixed inset-0 bg-black opacity-50 transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         onClick={handleClose}
       />
 
       {/* 模态框 */}
       <div className="flex min-h-screen items-center justify-center p-4">
         <div
-          className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all w-full max-w-md"
+          className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl transform transition-all w-full max-w-md animate-fade-in"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 头部 */}
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
               Chroma DB Settings
             </h3>
           </div>
@@ -88,7 +88,7 @@ export default function SettingsModal({ isOpen, onClose, onSave }: SettingsModal
           {/* 内容 */}
           <div className="px-6 py-4 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Host *
               </label>
               <input
@@ -96,13 +96,13 @@ export default function SettingsModal({ isOpen, onClose, onSave }: SettingsModal
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
                 placeholder="e.g., localhost, 192.168.1.100"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                 disabled={saving}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Port *
               </label>
               <input
@@ -110,29 +110,29 @@ export default function SettingsModal({ isOpen, onClose, onSave }: SettingsModal
                 value={port}
                 onChange={(e) => setPort(e.target.value)}
                 placeholder="e.g., 3003"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                 disabled={saving}
               />
             </div>
 
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-3 py-2 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-slate-500 dark:text-slate-400">
               <p>Your Chroma DB must be accessible at the specified host and port.</p>
             </div>
           </div>
 
           {/* 底部按钮 */}
-          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex justify-end space-x-3">
+          <div className="px-6 py-4 bg-slate-50 dark:bg-slate-700/50 flex justify-end space-x-3">
             <button
               type="button"
               onClick={handleClose}
               disabled={saving}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
@@ -140,7 +140,7 @@ export default function SettingsModal({ isOpen, onClose, onSave }: SettingsModal
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center"
+              className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
             >
               {saving ? (
                 <>

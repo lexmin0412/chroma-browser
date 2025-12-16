@@ -101,133 +101,147 @@ export default function ServerStatusPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* 主内容区 */}
-      <main className="flex-1 p-8 overflow-auto">
-        {/* 顶部导航 */}
-        <div className="mb-8">
-          <div className="flex items-center mb-4">
-            <Link href="/collections" className="text-blue-500 hover:text-blue-700 mr-4">
-              ← 返回集合列表
-            </Link>
-            <button
-              onClick={openSettingsModal}
-              className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
-            >
-              Settings
-            </button>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
-            Server Status
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Monitor and manage server status
-          </p>
-        </div>
-
-        {/* 通知提示 */}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            <strong className="font-bold">Error: </strong>
-            <span>{error}</span>
-          </div>
-        )}
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-            <strong className="font-bold">Success: </strong>
-            <span>{success}</span>
-          </div>
-        )}
-
-        {/* 服务器状态管理 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Server Status Management</h3>
-
-          {/* 服务器状态信息 */}
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-4xl mx-auto p-6 md:p-8">
+          {/* 顶部导航 */}
           <div className="mb-8">
-            <h4 className="text-lg font-medium text-gray-800 dark:text-white mb-4">Current Server Status</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Heartbeat</div>
-                <div className="text-lg font-semibold text-gray-800 dark:text-white">
-                  {serverStatus.heartbeat ? new Date(serverStatus.heartbeat).toLocaleString() : 'Not checked'}
-                </div>
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <Link href="/collections" className="inline-flex items-center gap-2 text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium mb-4">
+                  ← Back to Collections
+                </Link>
+                <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+                  Server Status
+                </h1>
+                <p className="text-slate-600 dark:text-slate-400 text-lg">
+                  Monitor and manage ChromaDB server
+                </p>
               </div>
-              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Version</div>
-                <div className="text-lg font-semibold text-gray-800 dark:text-white">
-                  {serverStatus.version || 'Unknown'}
+              <button
+              onClick={openSettingsModal}
+              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+            >
+              ⚙️ Settings
+            </button>
+            </div>
+
+            {/* 通知提示 */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 animate-fade-in">
+                <strong className="font-semibold">⚠️ Error: </strong>
+                <span>{error}</span>
+              </div>
+            )}
+            {success && (
+              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 animate-fade-in">
+                <strong className="font-semibold">✓ Success: </strong>
+                <span>{success}</span>
+              </div>
+            )}
+          </div>
+
+          {/* 服务器状态卡片 */}
+          <div className="grid gap-6">
+            {/* 状态信息 */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/50">
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Status Information</h2>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-700/50 dark:to-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
+                    <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-3 uppercase tracking-wide">Heartbeat</div>
+                    <code className="text-2xl font-semibold text-slate-900 dark:text-white font-mono break-all">
+                      {serverStatus.heartbeat ? new Date(serverStatus.heartbeat).toLocaleString() : '—'}
+                    </code>
+                  </div>
+                  <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-700/50 dark:to-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
+                    <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-3 uppercase tracking-wide">Version</div>
+                    <code className="text-2xl font-semibold text-slate-900 dark:text-white font-mono break-all">
+                      {serverStatus.version || '—'}
+                    </code>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <button
+                    onClick={checkServerStatus}
+                    disabled={checkingStatus}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                  >
+                    {checkingStatus ? (
+                      <>
+                        <LoadingSpinner size="sm" />
+                        <span>Checking...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>🔍</span>
+                        <span>Check Server Status</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4">
-              <button
-                onClick={checkServerStatus}
-                disabled={checkingStatus}
-                className="flex items-center bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-blue-300 disabled:cursor-not-allowed"
-              >
-                {checkingStatus ? (
-                  <>
-                    <div className="mr-2">
-                      <LoadingSpinner size="sm" />
+            {/* 危险操作区 */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/50">
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Danger Zone</h2>
+              </div>
+              <div className="p-6">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="text-3xl">⚠️</div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-2">Reset Database</h3>
+                      <p className="text-red-800 dark:text-red-300 mb-4 leading-relaxed">
+                        This action will permanently delete all collections and records in the database. This operation cannot be undone. Please make sure you have backed up any important data.
+                      </p>
+                      <button
+                        onClick={resetDatabase}
+                        disabled={resetting}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:bg-red-400 shadow-md hover:shadow-lg"
+                      >
+                        {resetting ? (
+                          <>
+                            <LoadingSpinner size="sm" />
+                            <span>Resetting...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>🔄</span>
+                            <span>Reset Database</span>
+                          </>
+                        )}
+                      </button>
                     </div>
-                    Checking...
-                  </>
-                ) : (
-                  'Check Server Status'
-                )}
-              </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* 数据库重置 */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-            <h4 className="text-lg font-medium text-gray-800 dark:text-white mb-4">Database Reset</h4>
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <div className="text-red-800 dark:text-red-200 mb-2">
-                ⚠️ Warning: This action will permanently delete all collections and records in the database.
-              </div>
-              <div className="text-red-700 dark:text-red-300 text-sm mb-4">
-                This operation cannot be undone. Please make sure you have backed up any important data before proceeding.
-              </div>
-              <button
-                onClick={resetDatabase}
-                disabled={resetting}
-                className="flex items-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md disabled:bg-red-400 disabled:cursor-not-allowed"
-              >
-                {resetting ? (
-                  <>
-                    <div className="mr-2">
-                      <LoadingSpinner size="sm" />
-                    </div>
-                    Resetting...
-                  </>
-                ) : (
-                  'Reset Database'
-                )}
-              </button>
-            </div>
-          </div>
+          {/* 确认对话框 */}
+          <ConfirmationDialog
+            isOpen={showResetConfirm}
+            onClose={() => setShowResetConfirm(false)}
+            onConfirm={handleResetConfirm}
+            title="确认重置数据库"
+            message="您确定要重置整个数据库吗？此操作将永久删除所有集合和记录，且无法撤销。"
+            confirmText="确认重置"
+            cancelText="取消"
+          />
+
+          {/* 设置模态框 */}
+          <SettingsModal
+            isOpen={isSettingsModalOpen}
+            onClose={() => setIsSettingsModalOpen(false)}
+            onSave={handleSettingsSaved}
+          />
         </div>
-
-        {/* 确认对话框 */}
-        <ConfirmationDialog
-          isOpen={showResetConfirm}
-          onClose={() => setShowResetConfirm(false)}
-          onConfirm={handleResetConfirm}
-          title="确认重置数据库"
-          message="您确定要重置整个数据库吗？此操作将永久删除所有集合和记录，且无法撤销。"
-          confirmText="确认重置"
-          cancelText="取消"
-        />
-
-        {/* 设置模态框 */}
-        <SettingsModal
-          isOpen={isSettingsModalOpen}
-          onClose={() => setIsSettingsModalOpen(false)}
-          onSave={handleSettingsSaved}
-        />
       </main>
     </div>
   );

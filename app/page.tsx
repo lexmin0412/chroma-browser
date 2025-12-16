@@ -12,15 +12,21 @@ export default function HomePage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">Chroma DB Manager</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Redirecting to collections page...
-        </p>
-        <div className="flex justify-center">
-          <div className="w-8 h-8 border-4 border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 items-center justify-center">
+      <div className="text-center space-y-6">
+        <div className="text-6xl">🗄️</div>
+        <div>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Chroma Browser</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-lg">
+            Modern ChromaDB Vector Database Manager
+          </p>
         </div>
+        <div className="flex justify-center pt-4">
+          <div className="w-8 h-8 border-4 border-violet-600 dark:border-violet-400 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+        </div>
+        <p className="text-slate-500 dark:text-slate-500 text-sm">
+          Loading...
+        </p>
       </div>
     </div>
   );
