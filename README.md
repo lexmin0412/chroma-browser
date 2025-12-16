@@ -1,21 +1,24 @@
 # Chroma Browser
 
-A web-based management interface for ChromaDB vector database, built with Next.js 14+ App Router.
+A modern web-based management interface for ChromaDB vector database, built with Next.js 16+ App Router and featuring a professional purple-themed UI design.
 
 ## Features
 
-- **Collection Management**: Create, list, and delete ChromaDB collections
+- **Collection Management**: Create, list, and delete ChromaDB collections with a modern UI
 - **Record Operations**: Add, query, get, update, and delete records within collections
 - **Server Status Monitoring**: Check server heartbeat and version, with database reset capability
-- **Responsive UI**: Clean, responsive interface built with Tailwind CSS
+- **Runtime Configuration**: Configure Chroma host and port through the settings interface (no environment variables required)
+- **Modern UI Design**: Professional purple-themed interface with gradients, smooth animations, and consistent styling
+- **Responsive Design**: Fully responsive layout that works on all screen sizes
 - **Type Safety**: Full TypeScript support for both client and server code
 - **Security**: All ChromaDB interactions happen server-side to prevent direct client access
+- **Dark Mode Support**: Automatic dark/light mode based on system preferences
 
 ## Prerequisites
 
 - Node.js >= 22
 - pnpm >= 10
-- A running ChromaDB instance (configured to run on port 3003)
+- A running ChromaDB instance
 
 ## Installation
 
@@ -41,7 +44,17 @@ app/
 ├── collection/[id]/     # Collection detail page
 ├── server/              # Server status page
 ├── components/          # Shared React components
-└── utils/              # Utility functions and services
+│   ├── ConfirmationDialog.tsx
+│   ├── Drawer.tsx
+│   ├── FormInput.tsx
+│   ├── LoadingSpinner.tsx
+│   └── SettingsModal.tsx
+├── utils/              # Utility functions and services
+│   ├── chroma-service.ts
+│   ├── chroma.ts
+│   └── config-manager.ts
+├── layout.tsx           # Root layout component
+└── page.tsx             # Home page (redirects to collections)
 ```
 
 ## API Endpoints
@@ -52,17 +65,16 @@ app/
 - `DELETE /api/collections` - Delete a collection
 
 ### Record Management
-- `GET /api/records/count` - Get record count in a collection
-- `POST /api/records/add` - Add records to a collection
-- `POST /api/records/get` - Get records from a collection
-- `POST /api/records/query` - Query records in a collection
-- `POST /api/records/delete` - Delete records from a collection
-- `POST /api/records/update` - Update records in a collection
-- `POST /api/records/upsert` - Upsert records in a collection
+- `GET /api/records?action=count&collection={name}` - Get record count in a collection
+- `GET /api/records?collection={name}` - Get records from a collection
+- `POST /api/records` - Add records to a collection
+- `PUT /api/records` - Query records in a collection
+- `DELETE /api/records` - Delete records from a collection
+- `PATCH /api/records` - Update records in a collection
 
 ### Server Management
-- `GET /api/server/status` - Check server status
-- `POST /api/server/reset` - Reset the entire database
+- `GET /api/server/status` - Check server status (returns heartbeat and version)
+- `DELETE /api/server/reset` - Reset the entire database
 
 ## Security
 
@@ -77,19 +89,32 @@ Comprehensive error handling with user-friendly messages for common issues:
 
 ## UI Components
 
-- **Loading Indicators**: Visual feedback during async operations
-- **Confirmation Dialogs**: Safety checks for destructive operations
-- **Form Validation**: Real-time input validation with helpful error messages
+- **Loading Indicators**: Violet-themed spinners with smooth animations
+- **Confirmation Dialogs**: Modern modal dialogs with backdrop blur for destructive operations
+- **Form Validation**: Real-time input validation with violet focus rings and helpful error messages
 - **Dark Mode Support**: Automatic dark/light mode based on system preferences
+- **Settings Modal**: Configure Chroma host and port at runtime
+- **Drawer Component**: Right-sliding drawer for collection creation
+- **Gradient Buttons**: Modern gradient buttons with purple/violet themes
+- **Responsive Cards**: Cards with rounded corners and subtle shadows
+- **Notification System**: Semantic color-coded notifications with emoji icons
 
 ## Development
 
 This project uses:
-- Next.js 14+ with App Router
+- Next.js 16+ with App Router
 - TypeScript for type safety
-- Tailwind CSS for styling
+- Tailwind CSS 4 for modern styling
 - React Server Components where appropriate
 - ESLint for code quality
+- ChromaDB JavaScript Client for database interactions
+
+### Key Dependencies
+
+- `chromadb`: ^3.1.8 - ChromaDB JavaScript client
+- `next`: 16.0.10 - Next.js framework
+- `react`: 19.2.1 - React library
+- `tailwindcss`: ^4 - CSS framework
 
 To build for production:
 ```bash
@@ -100,3 +125,27 @@ To start the production server:
 ```bash
 pnpm start
 ```
+
+## UI Modernization
+
+The application features a comprehensive modern UI redesign with a professional purple theme:
+
+### Color Palette
+- **Primary**: Violet (#7c3aed) with gradient effects
+- **Neutral**: Slate colors for better contrast and depth
+- **Success/Error/Warning**: Semantic colors with improved visibility
+
+### Design Features
+- Gradient buttons with smooth hover effects
+- Backdrop blur for modals and dialogs
+- Smooth animations and transitions
+- Responsive design with mobile support
+- Improved typography and spacing
+- Violet-themed focus states for accessibility
+
+### Key UI Components
+- Modern cards with rounded corners and subtle shadows
+- Right-sliding drawer for collection creation
+- Settings modal for runtime configuration
+- Confirmation dialogs for destructive operations
+- Violet-themed loading spinners
