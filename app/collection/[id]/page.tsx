@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { chromaService } from '../../utils/chroma-service';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
+import SettingsModal from '../../components/SettingsModal';
+import ConfigManager from '../../utils/config-manager';
 import type { GetResult, QueryResult, Metadata } from 'chromadb';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -30,6 +32,9 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // 设置相关状态
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   // 记录管理相关状态
   const [recordsLoading, setRecordsLoading] = useState(false);
@@ -705,6 +710,22 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
     }
   }, [error, success]);
 
+  // 打开设置模态框
+  const openSettingsModal = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  // 保存设置后的回调
+  const handleSettingsSaved = () => {
+    // 显示成功消息
+    setSuccess('Configuration saved successfully!');
+
+    // 重新加载记录计数以测试新配置
+    setTimeout(() => {
+      fetchRecordCount(collectionName);
+    }, 1000);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 主内容区 */}
@@ -715,12 +736,20 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
             <Link href="/collections" className="text-blue-500 hover:text-blue-700">
               ← 返回集合列表
             </Link>
-            <Link
-              href="/server"
-              className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
-            >
-              Server Status
-            </Link>
+            <div className="flex space-x-2">
+              <button
+                onClick={openSettingsModal}
+                className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
+              >
+                Settings
+              </button>
+              <Link
+                href="/server"
+                className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
+              >
+                Server Status
+              </Link>
+            </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
             Records in {collectionName}
@@ -1272,6 +1301,13 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
           message="确定要插入或更新选定的记录吗？"
           confirmText="插入/更新"
           cancelText="取消"
+        />
+
+        {/* 设置模态框 */}
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          onSave={handleSettingsSaved}
         />
       </main>
     </div>

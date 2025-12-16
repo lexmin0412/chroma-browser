@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { chromaService } from '@/app/utils/chroma-service';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import ConfirmationDialog from '@/app/components/ConfirmationDialog';
+import SettingsModal from '@/app/components/SettingsModal';
+import ConfigManager from '@/app/utils/config-manager';
 
 export default function ServerStatusPage() {
   // 服务器状态相关
@@ -14,6 +16,9 @@ export default function ServerStatusPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // 设置相关状态
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
   // 确认对话框状态
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -21,6 +26,22 @@ export default function ServerStatusPage() {
   const clearNotifications = () => {
     setError(null);
     setSuccess(null);
+  };
+
+  // 打开设置模态框
+  const openSettingsModal = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  // 保存设置后的回调
+  const handleSettingsSaved = () => {
+    // 显示成功消息
+    setSuccess('Configuration saved successfully!');
+
+    // 重新检查服务器状态以测试新配置
+    setTimeout(() => {
+      checkServerStatus();
+    }, 1000);
   };
 
   // 检查服务器状态
@@ -89,6 +110,12 @@ export default function ServerStatusPage() {
             <Link href="/collections" className="text-blue-500 hover:text-blue-700 mr-4">
               ← 返回集合列表
             </Link>
+            <button
+              onClick={openSettingsModal}
+              className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
+            >
+              Settings
+            </button>
           </div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
             Server Status
@@ -193,6 +220,13 @@ export default function ServerStatusPage() {
           message="您确定要重置整个数据库吗？此操作将永久删除所有集合和记录，且无法撤销。"
           confirmText="确认重置"
           cancelText="取消"
+        />
+
+        {/* 设置模态框 */}
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          onSave={handleSettingsSaved}
         />
       </main>
     </div>

@@ -2,17 +2,29 @@ import { NextResponse } from 'next/server';
 import { ChromaClient } from 'chromadb';
 
 // 创建 ChromaClient 实例
-const getClient = () => {
+const getClient = (host: string, port: number) => {
   return new ChromaClient({
-    host: process.env.CHROMA_SERVER_HOST || 'localhost',
-    port: process.env.CHROMA_SERVER_PORT ? parseInt(process.env.CHROMA_SERVER_PORT) : 3003,
+    host,
+    port,
   });
 };
 
 // 检查服务器状态
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const client = getClient();
+    const { searchParams } = new URL(request.url);
+    const host = searchParams.get('host');
+    const port = searchParams.get('port');
+
+    // 验证参数
+    if (!host || !port) {
+      return NextResponse.json({
+        success: false,
+        error: 'Host and port are required'
+      }, { status: 400 });
+    }
+
+    const client = getClient(host, parseInt(port));
 
     // 并行执行心跳和版本检查
     const [heartbeat, version] = await Promise.all([
@@ -35,9 +47,21 @@ export async function GET() {
 }
 
 // 重置数据库
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
-    const client = getClient();
+    const { searchParams } = new URL(request.url);
+    const host = searchParams.get('host');
+    const port = searchParams.get('port');
+
+    // 验证参数
+    if (!host || !port) {
+      return NextResponse.json({
+        success: false,
+        error: 'Host and port are required'
+      }, { status: 400 });
+    }
+
+    const client = getClient(host, parseInt(port));
     await client.reset();
 
     return NextResponse.json({ success: true });

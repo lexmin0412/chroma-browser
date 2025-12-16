@@ -2,18 +2,18 @@ import { NextResponse } from 'next/server';
 import { ChromaClient, Collection } from 'chromadb';
 
 // 创建 ChromaClient 实例
-const getClient = () => {
+const getClient = (host: string, port: number) => {
   return new ChromaClient({
-    host: process.env.CHROMA_SERVER_HOST || 'localhost',
-    port: process.env.CHROMA_SERVER_PORT ? parseInt(process.env.CHROMA_SERVER_PORT) : 3003,
+    host,
+    port,
   });
 };
 
 // 创建集合
 export async function POST(request: Request) {
   try {
-    const { name, metadata } = await request.json();
-    const client = getClient();
+    const { name, metadata, host, port } = await request.json();
+    const client = getClient(host, port);
 
     const collection = await client.createCollection({
       name,
@@ -37,9 +37,21 @@ export async function POST(request: Request) {
 }
 
 // 获取所有集合
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const client = getClient();
+    const { searchParams } = new URL(request.url);
+    const host = searchParams.get('host');
+    const port = searchParams.get('port');
+
+    // 验证参数
+    if (!host || !port) {
+      return NextResponse.json({
+        success: false,
+        error: 'Host and port are required'
+      }, { status: 400 });
+    }
+
+    const client = getClient(host, parseInt(port));
     const collections = await client.listCollections();
 
     // 转换集合数据格式
@@ -64,8 +76,8 @@ export async function GET() {
 // 删除集合
 export async function DELETE(request: Request) {
   try {
-    const { name } = await request.json();
-    const client = getClient();
+    const { name, host, port } = await request.json();
+    const client = getClient(host, port);
 
     await client.deleteCollection({ name });
 

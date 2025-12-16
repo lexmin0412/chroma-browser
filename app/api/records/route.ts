@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { ChromaClient, Collection } from 'chromadb';
 
 // 创建 ChromaClient 实例
-const getClient = () => {
+const getClient = (host: string, port: number) => {
   return new ChromaClient({
-    host: process.env.CHROMA_SERVER_HOST || 'localhost',
-    port: process.env.CHROMA_SERVER_PORT ? parseInt(process.env.CHROMA_SERVER_PORT) : 3003,
+    host,
+    port,
   });
 };
 
@@ -22,8 +22,8 @@ export async function OPTIONS() {
 // 添加记录
 export async function POST(request: Request) {
   try {
-    const { collectionName, params } = await request.json();
-    const client = getClient();
+    const { collectionName, params, host, port } = await request.json();
+    const client = getClient(host, port);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.add(params);
@@ -44,6 +44,16 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const collectionName = searchParams.get('collection');
     const action = searchParams.get('action') || 'get'; // 'get' or 'count'
+    const host = searchParams.get('host');
+    const port = searchParams.get('port');
+
+    // 验证参数
+    if (!host || !port) {
+      return NextResponse.json({
+        success: false,
+        error: 'Host and port are required'
+      }, { status: 400 });
+    }
 
     if (!collectionName) {
       return NextResponse.json({
@@ -52,7 +62,7 @@ export async function GET(request: Request) {
       }, { status: 400 });
     }
 
-    const client = getClient();
+    const client = getClient(host, parseInt(port));
     const collection = await getCollection(client, collectionName);
 
     if (action === 'count') {
@@ -99,8 +109,17 @@ export async function GET(request: Request) {
 // 查询记录
 export async function PUT(request: Request) {
   try {
-    const { collectionName, params } = await request.json();
-    const client = getClient();
+    const { collectionName, params, host, port } = await request.json();
+
+    // 验证参数
+    if (!host || !port) {
+      return NextResponse.json({
+        success: false,
+        error: 'Host and port are required'
+      }, { status: 400 });
+    }
+
+    const client = getClient(host, port);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.query(params);
@@ -118,8 +137,17 @@ export async function PUT(request: Request) {
 // 删除记录
 export async function DELETE(request: Request) {
   try {
-    const { collectionName, params } = await request.json();
-    const client = getClient();
+    const { collectionName, params, host, port } = await request.json();
+
+    // 验证参数
+    if (!host || !port) {
+      return NextResponse.json({
+        success: false,
+        error: 'Host and port are required'
+      }, { status: 400 });
+    }
+
+    const client = getClient(host, port);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.delete(params);
@@ -137,8 +165,17 @@ export async function DELETE(request: Request) {
 // 更新记录
 export async function PATCH(request: Request) {
   try {
-    const { collectionName, params } = await request.json();
-    const client = getClient();
+    const { collectionName, params, host, port } = await request.json();
+
+    // 验证参数
+    if (!host || !port) {
+      return NextResponse.json({
+        success: false,
+        error: 'Host and port are required'
+      }, { status: 400 });
+    }
+
+    const client = getClient(host, port);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.update(params);

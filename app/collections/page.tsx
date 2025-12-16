@@ -5,6 +5,8 @@ import { chromaService } from '../utils/chroma-service';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import Drawer from '../components/Drawer';
+import SettingsModal from '../components/SettingsModal';
+import ConfigManager from '../utils/config-manager';
 import type { Collection } from 'chromadb';
 import Link from 'next/link';
 
@@ -20,6 +22,9 @@ export default function CollectionsPage() {
   const [creatingCollection, setCreatingCollection] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [newCollectionMetadata, setNewCollectionMetadata] = useState(''); // JSON string
+
+  // 设置相关状态
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   // 确认对话框状态
   const [showDeleteCollectionConfirm, setShowDeleteCollectionConfirm] = useState(false);
@@ -49,6 +54,22 @@ export default function CollectionsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 打开设置模态框
+  const openSettingsModal = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  // 保存设置后的回调
+  const handleSettingsSaved = () => {
+    // 显示成功消息
+    setSuccess('Configuration saved successfully!');
+
+    // 重新加载集合列表以测试新配置
+    setTimeout(() => {
+      fetchCollections();
+    }, 1000);
   };
 
   // 打开创建集合抽屉
@@ -176,6 +197,12 @@ export default function CollectionsPage() {
               </p>
             </div>
             <div className="flex space-x-4">
+              <button
+                onClick={openSettingsModal}
+                className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
+              >
+                Settings
+              </button>
               <button
                 onClick={openCreateDrawer}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
@@ -343,6 +370,13 @@ export default function CollectionsPage() {
               </div>
             </div>
           </Drawer>
+
+          {/* 设置模态框 */}
+          <SettingsModal
+            isOpen={isSettingsModalOpen}
+            onClose={() => setIsSettingsModalOpen(false)}
+            onSave={handleSettingsSaved}
+          />
 
           {/* 确认对话框 */}
           <ConfirmationDialog
