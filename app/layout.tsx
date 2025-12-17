@@ -43,22 +43,10 @@ export default function RootLayout({
                   Collections
                 </Link>
                 <Link
-                  href="/metrics"
-                  className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
-                >
-                  Metrics
-                </Link>
-                <Link
-                  href="/sync"
-                  className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
-                >
-                  Sync
-                </Link>
-                <Link
                   href="/connections"
                   className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
                 >
-                  Settings
+                  Connections
                 </Link>
               </nav>
             </div>
