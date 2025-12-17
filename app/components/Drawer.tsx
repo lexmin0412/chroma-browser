@@ -28,7 +28,7 @@ export default function Drawer({ isOpen, onClose, title, children }: DrawerProps
       >
         <div className="h-full flex flex-col bg-white dark:bg-slate-800 shadow-2xl">
           {/* 头部 */}
-          <div className="px-6 py-5 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800 border-b border-slate-200 dark:border-slate-700">
+          <div className="px-6 py-5 bg-linear-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                 {title}

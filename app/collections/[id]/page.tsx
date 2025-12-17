@@ -775,37 +775,37 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
               <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => setActiveRecordTab('add')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'add' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'add' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Add Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('query')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'query' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'query' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Query Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('get')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'get' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'get' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Get Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('delete')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'delete' ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'delete' ? 'bg-linear-to-r from-red-600 to-orange-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Delete Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('update')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'update' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'update' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Update Records
                 </button>
                 <button
                   onClick={() => setActiveRecordTab('upsert')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'upsert' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'upsert' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
                   Upsert Records
                 </button>
@@ -879,7 +879,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={addRecords}
                       disabled={addingRecords || !newRecordIds.trim()}
-                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
+                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {addingRecords ? (
                         <>
@@ -957,7 +957,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={queryRecords}
                       disabled={queryingRecords || (!queryText.trim() && !queryEmbedding.trim())}
-                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
+                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {queryingRecords ? (
                         <>
@@ -1021,7 +1021,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={getRecords}
                       disabled={fetchingRecords}
-                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
+                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {fetchingRecords ? (
                         <>
@@ -1071,7 +1071,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={deleteRecords}
                       disabled={deletingRecords || (!deleteRecordIds.trim() && !deleteRecordWhere.trim())}
-                      className="px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:from-red-400 disabled:to-orange-400 shadow-lg hover:shadow-xl hover:shadow-orange-500/30 disabled:shadow-none flex items-center"
+                      className="px-4 py-2 bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:from-red-400 disabled:to-orange-400 shadow-lg hover:shadow-xl hover:shadow-orange-500/30 disabled:shadow-none flex items-center"
                     >
                       {deletingRecords ? (
                         <>
@@ -1149,7 +1149,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={updateRecords}
                       disabled={updatingRecords || !updateRecordIds.trim()}
-                      className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
+                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
                     >
                       {updatingRecords ? (
                         <>
@@ -1227,7 +1227,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
                     <button
                       onClick={upsertRecords}
                       disabled={upsertingRecords || !upsertRecordIds.trim()}
-                      className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg font-medium transition-all disabled:from-emerald-400 disabled:to-teal-400 shadow-lg hover:shadow-xl hover:shadow-teal-500/30 disabled:shadow-none flex items-center"
+                      className="px-4 py-2 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg font-medium transition-all disabled:from-emerald-400 disabled:to-teal-400 shadow-lg hover:shadow-xl hover:shadow-teal-500/30 disabled:shadow-none flex items-center"
                     >
                       {upsertingRecords ? (
                         <>

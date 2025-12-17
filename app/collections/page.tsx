@@ -39,7 +39,7 @@ export default function CollectionsPage() {
         </div>
 
         {/* 操作指南 */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl shadow-sm border border-blue-200 dark:border-blue-700 p-6">
+        <div className="bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl shadow-sm border border-blue-200 dark:border-blue-700 p-6">
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">
             如何使用
           </h3>
