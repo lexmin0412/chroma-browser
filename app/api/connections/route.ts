@@ -16,18 +16,18 @@ export async function POST(request: Request) {
     const data = await request.json();
 
     // 验证必填字段
-    if (!data.name || !data.type) {
-      return NextResponse.json({ error: 'Name and type are required' }, { status: 400 });
+    if (!data.name || !data.type || !data.config) {
+      return NextResponse.json({ error: 'Name, type and config are required' }, { status: 400 });
     }
 
-    // 根据连接类型验证特定字段
+    // 根据连接类型验证config中的特定字段
     if (data.type === 'ChromaNormal') {
-      if (!data.host || !data.port) {
-        return NextResponse.json({ error: 'Host and port are required for ChromaNormal connection' }, { status: 400 });
+      if (!data.config.host || !data.config.port) {
+        return NextResponse.json({ error: 'Host and port are required in config for ChromaNormal connection' }, { status: 400 });
       }
     } else if (data.type === 'ChromaCloud') {
-      if (!data.apiKey || !data.tenant || !data.database) {
-        return NextResponse.json({ error: 'API Key, Tenant and Database are required for ChromaCloud connection' }, { status: 400 });
+      if (!data.config.apiKey || !data.config.tenant || !data.config.database) {
+        return NextResponse.json({ error: 'API Key, Tenant and Database are required in config for ChromaCloud connection' }, { status: 400 });
       }
     }
 
@@ -35,11 +35,7 @@ export async function POST(request: Request) {
       data: {
         name: data.name,
         type: data.type,
-        host: data.host,
-        port: data.port,
-        apiKey: data.apiKey,
-        tenant: data.tenant,
-        database: data.database,
+        config: data.config,
         description: data.description
       }
     });
@@ -63,18 +59,18 @@ export async function PUT(request: Request) {
     const data = await request.json();
 
     // 验证必填字段
-    if (!data.name || !data.type) {
-      return NextResponse.json({ error: 'Name and type are required' }, { status: 400 });
+    if (!data.name || !data.type || !data.config) {
+      return NextResponse.json({ error: 'Name, type and config are required' }, { status: 400 });
     }
 
-    // 根据连接类型验证特定字段
+    // 根据连接类型验证config中的特定字段
     if (data.type === 'ChromaNormal') {
-      if (!data.host || !data.port) {
-        return NextResponse.json({ error: 'Host and port are required for ChromaNormal connection' }, { status: 400 });
+      if (!data.config.host || !data.config.port) {
+        return NextResponse.json({ error: 'Host and port are required in config for ChromaNormal connection' }, { status: 400 });
       }
     } else if (data.type === 'ChromaCloud') {
-      if (!data.apiKey || !data.tenant || !data.database) {
-        return NextResponse.json({ error: 'API Key, Tenant and Database are required for ChromaCloud connection' }, { status: 400 });
+      if (!data.config.apiKey || !data.config.tenant || !data.config.database) {
+        return NextResponse.json({ error: 'API Key, Tenant and Database are required in config for ChromaCloud connection' }, { status: 400 });
       }
     }
 
@@ -83,11 +79,7 @@ export async function PUT(request: Request) {
       data: {
         name: data.name,
         type: data.type,
-        host: data.host,
-        port: data.port,
-        apiKey: data.apiKey,
-        tenant: data.tenant,
-        database: data.database,
+        config: data.config,
         description: data.description
       }
     });

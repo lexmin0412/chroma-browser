@@ -17,11 +17,7 @@ model Connection {
   id          Int      @id @default(autoincrement())
   name        String   @unique
   type        ConnectionType
-  host        String?  @map("normal_host")
-  port        Int?     @map("normal_port")
-  apiKey      String?  @map("cloud_api_key")
-  tenant      String?  @map("cloud_tenant")
-  database    String?  @map("cloud_database")
+  config      Json?
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

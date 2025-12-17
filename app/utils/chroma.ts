@@ -1,26 +1,31 @@
 import { ChromaClient, CloudClient } from "chromadb";
-import { Connection } from "@/app/generated/prisma/client";
+import { IConnectionItem } from "@/types";
 
 // 连接类型定义
 export type ConnectionType = "ChromaNormal" | "ChromaCloud";
 
 // 创建 ChromaClient 实例
-export const getClient = (connection: Connection) => {
-	if (connection.type === "ChromaNormal") {
-		// Chroma Normal 连接（本地或自托管）
-		return new ChromaClient({
-			host: connection.host as string,
-			port: connection.port as number,
-		});
-	} else if (connection.type === "ChromaCloud") {
-		// Chroma Cloud 连接
-		return new CloudClient({
-			apiKey: connection.apiKey as string,
-			tenant: connection.tenant as string,
-			database: connection.database as string,
-		});
-	} else {
-		throw new Error(`Unsupported connection type: ${connection.type}`);
+export const getClient = (connection: IConnectionItem) => {
+	if (!connection.config) {
+		throw new Error(`Connection config is required for ${connection.type} connection`);
+	}
+
+	switch (connection.type) {
+		case "ChromaNormal":
+			// Chroma Normal 连接（本地或自托管）
+			return new ChromaClient({
+				host: connection.config.host as string,
+				port: connection.config.port as number,
+			});
+		case "ChromaCloud":
+			// Chroma Cloud 连接
+			return new CloudClient({
+				apiKey: connection.config.apiKey as string,
+				tenant: connection.config.tenant as string,
+				database: connection.config.database as string,
+			});
+		default:
+			throw new Error(`Unsupported connection type: ${(connection as Record<string, string>).type}`);
 	}
 };
 
