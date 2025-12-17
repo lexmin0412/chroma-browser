@@ -95,7 +95,7 @@ Completed a comprehensive modern UI redesign to elevate the interface from basic
 
 ### 1. Gradient Buttons
 ```html
-bg-gradient-to-r from-violet-600 to-purple-600 
+bg-linear-to-r from-violet-600 to-purple-600 
 hover:from-violet-700 hover:to-purple-700
 ```
 
@@ -107,7 +107,7 @@ rounded-xl shadow-sm border border-slate-200 dark:border-slate-700
 ### 3. Button Variants
 ```html
 <!-- Primary Action (Violet Gradient) -->
-bg-gradient-to-r from-violet-600 to-purple-600 
+bg-linear-to-r from-violet-600 to-purple-600 
 hover:from-violet-700 hover:to-purple-700
 shadow-lg hover:shadow-xl hover:shadow-purple-500/30
 
@@ -164,7 +164,7 @@ border-r-transparent border-b-transparent border-l-transparent
 
 ### Violet Gradient Button
 ```jsx
-<button className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium shadow-lg hover:shadow-xl hover:shadow-purple-500/30">
+<button className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium shadow-lg hover:shadow-xl hover:shadow-purple-500/30">
   <LoadingSpinner size="sm" />
   <span>Loading...</span>
 </button>
