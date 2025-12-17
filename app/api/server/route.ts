@@ -1,23 +1,35 @@
 import { NextResponse } from 'next/server';
 import { getClient } from '@/app/utils/chroma';
+import { prisma } from '@/app/utils/prisma';
 
 
 // 检查服务器状态
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const host = searchParams.get('host');
-    const port = searchParams.get('port');
+    const connectionId = searchParams.get('connectionId');
 
     // 验证参数
-    if (!host || !port) {
+    if (!connectionId) {
       return NextResponse.json({
         success: false,
-        error: 'Host and port are required'
+        error: 'Connection ID is required'
       }, { status: 400 });
     }
 
-    const client = getClient(host, parseInt(port));
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: parseInt(connectionId) }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
 
     // 并行执行心跳和版本检查
     const [heartbeat, version] = await Promise.all([
@@ -43,18 +55,29 @@ export async function GET(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const host = searchParams.get('host');
-    const port = searchParams.get('port');
+    const connectionId = searchParams.get('connectionId');
 
     // 验证参数
-    if (!host || !port) {
+    if (!connectionId) {
       return NextResponse.json({
         success: false,
-        error: 'Host and port are required'
+        error: 'Connection ID is required'
       }, { status: 400 });
     }
 
-    const client = getClient(host, parseInt(port));
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: parseInt(connectionId) }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     await client.reset();
 
     return NextResponse.json({ success: true });

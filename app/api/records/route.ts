@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getClient, getCollection } from '@/app/utils/chroma';
+import { prisma } from '@/app/utils/prisma';
 
 
 // 获取记录数量
@@ -10,8 +11,29 @@ export async function OPTIONS() {
 // 添加记录
 export async function POST(request: Request) {
   try {
-    const { collectionName, params, host, port } = await request.json();
-    const client = getClient(host, port);
+    const { collectionName, params, connectionId } = await request.json();
+
+    // 验证参数
+    if (!connectionId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection ID is required'
+      }, { status: 400 });
+    }
+
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: connectionId }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.add(params);
@@ -32,14 +54,13 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const collectionName = searchParams.get('collection');
     const action = searchParams.get('action') || 'get'; // 'get' or 'count'
-    const host = searchParams.get('host');
-    const port = searchParams.get('port');
+    const connectionId = searchParams.get('connectionId');
 
     // 验证参数
-    if (!host || !port) {
+    if (!connectionId) {
       return NextResponse.json({
         success: false,
-        error: 'Host and port are required'
+        error: 'Connection ID is required'
       }, { status: 400 });
     }
 
@@ -50,7 +71,19 @@ export async function GET(request: Request) {
       }, { status: 400 });
     }
 
-    const client = getClient(host, parseInt(port));
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: parseInt(connectionId) }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     const collection = await getCollection(client, collectionName);
 
     if (action === 'count') {
@@ -64,12 +97,14 @@ export async function GET(request: Request) {
       const limitParam = searchParams.get('limit');
       const whereParam = searchParams.get('where');
 
-      type WhereValue = string | number | boolean | Record<string, WhereValue>;
+      interface WhereValue {
+        [key: string]: string | number | boolean | WhereValue;
+      }
 
       interface GetParams {
         ids?: string[];
         limit?: number;
-        where?: Record<string, WhereValue>;
+        where?: WhereValue;
       }
 
       const params: GetParams = {};
@@ -90,7 +125,7 @@ export async function GET(request: Request) {
         }
       }
 
-      const result = await collection.get(params);
+      const result = await collection.get(params as any);
       return NextResponse.json({ success: true, result });
     }
   } catch (error) {
@@ -105,17 +140,29 @@ export async function GET(request: Request) {
 // 查询记录
 export async function PUT(request: Request) {
   try {
-    const { collectionName, params, host, port } = await request.json();
+    const { collectionName, params, connectionId } = await request.json();
 
     // 验证参数
-    if (!host || !port) {
+    if (!connectionId) {
       return NextResponse.json({
         success: false,
-        error: 'Host and port are required'
+        error: 'Connection ID is required'
       }, { status: 400 });
     }
 
-    const client = getClient(host, port);
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: connectionId }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.query(params);
@@ -133,17 +180,29 @@ export async function PUT(request: Request) {
 // 删除记录
 export async function DELETE(request: Request) {
   try {
-    const { collectionName, params, host, port } = await request.json();
+    const { collectionName, params, connectionId } = await request.json();
 
     // 验证参数
-    if (!host || !port) {
+    if (!connectionId) {
       return NextResponse.json({
         success: false,
-        error: 'Host and port are required'
+        error: 'Connection ID is required'
       }, { status: 400 });
     }
 
-    const client = getClient(host, port);
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: connectionId }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.delete(params);
@@ -161,17 +220,29 @@ export async function DELETE(request: Request) {
 // 更新记录
 export async function PATCH(request: Request) {
   try {
-    const { collectionName, params, host, port } = await request.json();
+    const { collectionName, params, connectionId } = await request.json();
 
     // 验证参数
-    if (!host || !port) {
+    if (!connectionId) {
       return NextResponse.json({
         success: false,
-        error: 'Host and port are required'
+        error: 'Connection ID is required'
       }, { status: 400 });
     }
 
-    const client = getClient(host, port);
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: connectionId }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.update(params);

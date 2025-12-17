@@ -1,34 +1,41 @@
 import type { CollectionMetadata, Metadata, Where, WhereDocument } from 'chromadb';
-import ConfigManager from './config-manager';
 
 // 客户端服务用于与服务端 API 通信
 class ChromaService {
   private baseUrl: string;
+  private currentConnectionId: number | null;
 
   constructor() {
     this.baseUrl = '/api';
+    this.currentConnectionId = null;
   }
 
-  // 获取配置的主机和端口
-  private getHostAndPort() {
-    const config = ConfigManager.getInstance().getConfig();
-    if (!ConfigManager.getInstance().isConfigured()) {
-      throw new Error('Chroma DB host and port must be configured. Please set them in the settings.');
+  // 设置当前使用的连接 ID
+  setCurrentConnection(id: number) {
+    this.currentConnectionId = id;
+    localStorage.setItem('currentChromaConnection', id.toString());
+  }
+
+  // 获取当前使用的连接 ID
+  getCurrentConnection(): number {
+    if (!this.currentConnectionId) {
+      const savedId = localStorage.getItem('currentChromaConnection');
+      if (savedId) {
+        this.currentConnectionId = parseInt(savedId);
+      } else {
+        throw new Error('No Chroma DB connection selected. Please select a connection in the Connections page.');
+      }
     }
-    return {
-      host: config.host,
-      port: config.port
-    };
+    return this.currentConnectionId;
   }
 
   // 构建带参数的 URL
   private buildUrlWithParams(url: string, params: Record<string, string | number>): string {
-    const { host, port } = this.getHostAndPort();
+    const connectionId = this.getCurrentConnection();
     const urlObj = new URL(url, window.location.origin);
 
-    // 添加主机和端口参数
-    urlObj.searchParams.append('host', host!);
-    urlObj.searchParams.append('port', port!.toString());
+    // 添加连接 ID 参数
+    urlObj.searchParams.append('connectionId', connectionId.toString());
 
     // 添加其他参数
     Object.keys(params).forEach(key => {
@@ -42,13 +49,13 @@ class ChromaService {
 
   // 创建集合
   async createCollection(name: string, metadata?: CollectionMetadata) {
-    const { host, port } = this.getHostAndPort();
-    const response = await fetch(`${this.baseUrl}/collections?host=${encodeURIComponent(host!)}&port=${port}`, {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/collections?connectionId=${connectionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, metadata, host, port }),
+      body: JSON.stringify({ name, metadata, connectionId }),
     });
 
     const result = await response.json();
@@ -79,13 +86,13 @@ class ChromaService {
 
   // 删除集合
   async deleteCollection(name: string) {
-    const { host, port } = this.getHostAndPort();
-    const response = await fetch(`${this.baseUrl}/collections?host=${encodeURIComponent(host!)}&port=${port}`, {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/collections?connectionId=${connectionId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, host, port }),
+      body: JSON.stringify({ name, connectionId }),
     });
 
     const result = await response.json();
@@ -100,13 +107,13 @@ class ChromaService {
 
   // 添加记录
   async addRecords(collectionName: string, params: { ids: string[]; embeddings?: number[][]; metadatas?: Metadata[]; documents?: string[] }) {
-    const { host, port } = this.getHostAndPort();
-    const response = await fetch(`${this.baseUrl}/records?host=${encodeURIComponent(host!)}&port=${port}`, {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/records?connectionId=${connectionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ collectionName, params, host, port }),
+      body: JSON.stringify({ collectionName, params, connectionId }),
     });
 
     const result = await response.json();
@@ -170,13 +177,13 @@ class ChromaService {
 
   // 查询记录
   async queryRecords(collectionName: string, params: { queryEmbeddings?: number[][]; queryTexts?: string[]; ids?: string[]; nResults: number; where?: Where; include?: ('distances' | 'documents' | 'embeddings' | 'metadatas' | 'uris')[] }) {
-    const { host, port } = this.getHostAndPort();
-    const response = await fetch(`${this.baseUrl}/records?host=${encodeURIComponent(host!)}&port=${port}`, {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/records?connectionId=${connectionId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ collectionName, params, host, port }),
+      body: JSON.stringify({ collectionName, params, connectionId }),
     });
 
     const result = await response.json();
@@ -189,13 +196,13 @@ class ChromaService {
 
   // 删除记录
   async deleteRecords(collectionName: string, params: { ids?: string[]; where?: Where; whereDocument?: WhereDocument }) {
-    const { host, port } = this.getHostAndPort();
-    const response = await fetch(`${this.baseUrl}/records?host=${encodeURIComponent(host!)}&port=${port}`, {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/records?connectionId=${connectionId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ collectionName, params, host, port }),
+      body: JSON.stringify({ collectionName, params, connectionId }),
     });
 
     const result = await response.json();
@@ -208,13 +215,13 @@ class ChromaService {
 
   // 更新记录
   async updateRecords(collectionName: string, params: { ids: string[]; embeddings?: number[][]; metadatas?: Metadata[]; documents?: string[] }) {
-    const { host, port } = this.getHostAndPort();
-    const response = await fetch(`${this.baseUrl}/records?host=${encodeURIComponent(host!)}&port=${port}`, {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/records?connectionId=${connectionId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ collectionName, params, host, port }),
+      body: JSON.stringify({ collectionName, params, connectionId }),
     });
 
     const result = await response.json();
@@ -278,13 +285,13 @@ class ChromaService {
 
   // 重置数据库
   async resetDatabase() {
-    const { host, port } = this.getHostAndPort();
-    const response = await fetch(`${this.baseUrl}/server?host=${encodeURIComponent(host!)}&port=${port}`, {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/server?connectionId=${connectionId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ host, port }),
+      body: JSON.stringify({ connectionId }),
     });
 
     const result = await response.json();

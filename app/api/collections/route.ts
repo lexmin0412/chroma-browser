@@ -1,12 +1,34 @@
 import { NextResponse } from 'next/server';
 import { getClient } from '@/app/utils/chroma';
+import { prisma } from '@/app/utils/prisma';
 
 
 // 创建集合
 export async function POST(request: Request) {
   try {
-    const { name, metadata, host, port } = await request.json();
-    const client = getClient(host, port);
+    const { name, metadata, connectionId } = await request.json();
+
+    // 验证参数
+    if (!connectionId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection ID is required'
+      }, { status: 400 });
+    }
+
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: connectionId }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
 
     const collection = await client.createCollection({
       name,
@@ -33,22 +55,33 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const host = searchParams.get('host');
-    const port = searchParams.get('port');
+    const connectionId = searchParams.get('connectionId');
 
     // 验证参数
-    if (!host || !port) {
+    if (!connectionId) {
       return NextResponse.json({
         success: false,
-        error: 'Host and port are required'
+        error: 'Connection ID is required'
       }, { status: 400 });
     }
 
-    const client = getClient(host, parseInt(port));
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: parseInt(connectionId) }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     const collections = await client.listCollections();
 
     // 转换集合数据格式
-    const collectionData = collections.map((collection: Collection) => ({
+    const collectionData = collections.map((collection) => ({
       name: collection.name,
       metadata: collection.metadata
     }));
@@ -69,9 +102,29 @@ export async function GET(request: Request) {
 // 删除集合
 export async function DELETE(request: Request) {
   try {
-    const { name, host, port } = await request.json();
-    const client = getClient(host, port);
+    const { name, connectionId } = await request.json();
 
+    // 验证参数
+    if (!connectionId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection ID is required'
+      }, { status: 400 });
+    }
+
+    // 从数据库获取连接配置
+    const connection = await prisma.connection.findUnique({
+      where: { id: connectionId }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection);
     await client.deleteCollection({ name });
 
     return NextResponse.json({ success: true });

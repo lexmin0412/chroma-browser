@@ -16,9 +16,9 @@ export default function HomePage() {
       <div className="text-center space-y-6">
         <div className="text-6xl">🗄️</div>
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Chroma Browser</h1>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Vector DB Browser</h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
-            Modern ChromaDB Vector Database Manager
+            Modern Vector Database Manager
           </p>
         </div>
         <div className="flex justify-center pt-4">
