@@ -84,7 +84,7 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
   const [showDeleteRecordsConfirm, setShowDeleteRecordsConfirm] = useState(false);
   const [showUpdateRecordsConfirm, setShowUpdateRecordsConfirm] = useState(false);
   const [showUpsertRecordsConfirm, setShowUpsertRecordsConfirm] = useState(false);
-  const [deleteParams, setDeleteParams] = useState<{ ids?: string[]; where?: any } | null>(null);
+  const [deleteParams, setDeleteParams] = useState<{ ids?: string[]; where?: Metadata } | null>(null);
   const [updateParams, setUpdateParams] = useState<{ ids: string[]; embeddings?: number[][]; metadatas?: Metadata[]; documents?: string[] } | null>(null);
   const [upsertParams, setUpsertParams] = useState<{ ids: string[]; embeddings?: number[][]; metadatas?: Metadata[]; documents?: string[] } | null>(null);
 

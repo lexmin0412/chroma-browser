@@ -44,17 +44,7 @@ app/
 ├── collection/[id]/     # Collection detail page
 ├── server/              # Server status page
 ├── components/          # Shared React components
-│   ├── ConfirmationDialog.tsx
-│   ├── Drawer.tsx
-│   ├── FormInput.tsx
-│   ├── LoadingSpinner.tsx
-│   └── SettingsModal.tsx
-├── utils/              # Utility functions and services
-│   ├── chroma-service.ts
-│   ├── chroma.ts
-│   └── config-manager.ts
-├── layout.tsx           # Root layout component
-└── page.tsx             # Home page (redirects to collections)
+└── utils/              # Utility functions and services
 ```
 
 ## API Endpoints
@@ -65,16 +55,17 @@ app/
 - `DELETE /api/collections` - Delete a collection
 
 ### Record Management
-- `GET /api/records?action=count&collection={name}` - Get record count in a collection
-- `GET /api/records?collection={name}` - Get records from a collection
-- `POST /api/records` - Add records to a collection
-- `PUT /api/records` - Query records in a collection
-- `DELETE /api/records` - Delete records from a collection
-- `PATCH /api/records` - Update records in a collection
+- `GET /api/records/count` - Get record count in a collection
+- `POST /api/records/add` - Add records to a collection
+- `POST /api/records/get` - Get records from a collection
+- `POST /api/records/query` - Query records in a collection
+- `POST /api/records/delete` - Delete records from a collection
+- `POST /api/records/update` - Update records in a collection
+- `POST /api/records/upsert` - Upsert records in a collection
 
 ### Server Management
-- `GET /api/server/status` - Check server status (returns heartbeat and version)
-- `DELETE /api/server/reset` - Reset the entire database
+- `GET /api/server/status` - Check server status
+- `POST /api/server/reset` - Reset the entire database
 
 ## Security
 

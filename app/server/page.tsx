@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { chromaService } from '@/app/utils/chroma-service';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import ConfirmationDialog from '@/app/components/ConfirmationDialog';
 import SettingsModal from '@/app/components/SettingsModal';
-import ConfigManager from '@/app/utils/config-manager';
 
 export default function ServerStatusPage() {
   // 服务器状态相关
@@ -121,7 +120,7 @@ export default function ServerStatusPage() {
               </div>
               <button
               onClick={openSettingsModal}
-              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+              className="inline-flex items-center px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-all font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
             >
               ⚙️ Settings
             </button>
@@ -146,18 +145,18 @@ export default function ServerStatusPage() {
           <div className="grid gap-6">
             {/* 状态信息 */}
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/50">
+              <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 bg-linear-to-r from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/50">
                 <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Status Information</h2>
               </div>
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-700/50 dark:to-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
+                  <div className="bg-linear-to-br from-slate-50 to-white dark:from-slate-700/50 dark:to-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
                     <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-3 uppercase tracking-wide">Heartbeat</div>
                     <code className="text-2xl font-semibold text-slate-900 dark:text-white font-mono break-all">
                       {serverStatus.heartbeat ? new Date(serverStatus.heartbeat).toLocaleString() : '—'}
                     </code>
                   </div>
-                  <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-700/50 dark:to-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
+                  <div className="bg-linear-to-br from-slate-50 to-white dark:from-slate-700/50 dark:to-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
                     <div className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-3 uppercase tracking-wide">Version</div>
                     <code className="text-2xl font-semibold text-slate-900 dark:text-white font-mono break-all">
                       {serverStatus.version || '—'}
@@ -168,7 +167,7 @@ export default function ServerStatusPage() {
                   <button
                     onClick={checkServerStatus}
                     disabled={checkingStatus}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
                   >
                     {checkingStatus ? (
                       <>
@@ -188,7 +187,7 @@ export default function ServerStatusPage() {
 
             {/* 危险操作区 */}
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/50">
+              <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 bg-linear-to-r from-white to-slate-50 dark:from-slate-800 dark:to-slate-800/50">
                 <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Danger Zone</h2>
               </div>
               <div className="p-6">

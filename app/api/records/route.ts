@@ -1,18 +1,6 @@
 import { NextResponse } from 'next/server';
-import { ChromaClient, Collection } from 'chromadb';
+import { getClient, getCollection } from '@/app/utils/chroma';
 
-// 创建 ChromaClient 实例
-const getClient = (host: string, port: number) => {
-  return new ChromaClient({
-    host,
-    port,
-  });
-};
-
-// 获取集合实例
-const getCollection = async (client: ChromaClient, name: string): Promise<Collection> => {
-  return await client.getCollection({ name });
-};
 
 // 获取记录数量
 export async function OPTIONS() {
@@ -76,7 +64,15 @@ export async function GET(request: Request) {
       const limitParam = searchParams.get('limit');
       const whereParam = searchParams.get('where');
 
-      const params: any = {};
+      type WhereValue = string | number | boolean | Record<string, WhereValue>;
+
+      interface GetParams {
+        ids?: string[];
+        limit?: number;
+        where?: Record<string, WhereValue>;
+      }
+
+      const params: GetParams = {};
 
       if (idsParam) {
         params.ids = idsParam.split(',');
@@ -89,7 +85,7 @@ export async function GET(request: Request) {
       if (whereParam) {
         try {
           params.where = JSON.parse(whereParam);
-        } catch (e) {
+        } catch {
           // 如果解析失败，忽略where参数
         }
       }

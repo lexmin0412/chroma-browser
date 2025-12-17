@@ -1,13 +1,6 @@
 import { NextResponse } from 'next/server';
-import { ChromaClient } from 'chromadb';
+import { getClient } from '@/app/utils/chroma';
 
-// 创建 ChromaClient 实例
-const getClient = (host: string, port: number) => {
-  return new ChromaClient({
-    host,
-    port,
-  });
-};
 
 // 检查服务器状态
 export async function GET(request: Request) {
