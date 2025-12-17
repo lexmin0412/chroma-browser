@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from 'next/link';
+import Image from 'next/image';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Vector DB Browser",
   description: "A modern web-based management interface for vector databases",
+  icons: {
+    icon: "/vector-icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -33,6 +37,13 @@ export default function RootLayout({
           <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
             <div className="container mx-auto px-4 py-3 flex justify-between items-center">
               <div className="flex items-center gap-2">
+                <Image
+                  src="/vector-icon.svg"
+                  alt="Vector Icon"
+                  width={24}
+                  height={24}
+                  className="text-violet-600"
+                />
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">Vector DB Browser</h1>
               </div>
               <nav className="flex gap-4 items-center">
