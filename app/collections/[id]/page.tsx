@@ -732,25 +732,6 @@ export default function CollectionDetailPage({ params: routeParams }: { params: 
       <main className="flex-1 p-8 overflow-auto">
         {/* 顶部导航 */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <Link href="/collections" className="text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 font-medium">
-              ← 返回集合列表
-            </Link>
-            <div className="flex space-x-2">
-              <button
-            onClick={openSettingsModal}
-            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-colors font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
-          >
-                Settings
-              </button>
-              <Link
-                href="/server"
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg transition-colors font-medium text-sm shadow-lg hover:shadow-xl hover:shadow-purple-500/30"
-              >
-                Server Status
-              </Link>
-            </div>
-          </div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
             Records in {collectionName}
           </h2>
