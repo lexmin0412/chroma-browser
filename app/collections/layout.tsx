@@ -6,9 +6,9 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import Drawer from '../components/Drawer';
 
-import ConfigManager from '../utils/config-manager';
 import type { Collection } from 'chromadb';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {
   // 状态管理
@@ -17,13 +17,14 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // 获取当前路径以判断选中的集合
+  const pathname = usePathname();
+
   // 创建集合相关状态
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
   const [creatingCollection, setCreatingCollection] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [newCollectionMetadata, setNewCollectionMetadata] = useState(''); // JSON string
-
-
 
   // 确认对话框状态
   const [showDeleteCollectionConfirm, setShowDeleteCollectionConfirm] = useState(false);
@@ -167,24 +168,24 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="flex h-full bg-slate-50 dark:bg-slate-950">
       {/* 左侧集合列表 */}
-      <aside className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-sm overflow-y-auto">
+      <aside className="w-64 bg-gray-100 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-sm h-full overflow-y-auto">
         <div className="p-4 border-b border-slate-200 dark:border-slate-700">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Collections</h2>
+            <h5 className="text-lg font-semibold text-slate-900 dark:text-white">Collections</h5>
             <div className="flex gap-2">
               <button
                 onClick={fetchCollections}
                 disabled={loading}
-                className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                className="p-1.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
                 title="Refresh collections"
               >
                 {loading ? <LoadingSpinner size="sm" /> : "🔄"}
               </button>
               <button
                 onClick={openCreateDrawer}
-                className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                className="p-1.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
                 title="Create collection"
               >
                 ➕
@@ -198,25 +199,28 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
               <LoadingSpinner size="sm" />
             </div>
           ) : collections.length > 0 ? (
-            collections.map((collection) => (
-              <Link
-                key={collection.id}
-                href={`/collections/${collection.name}`}
-                className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors group"
-              >
-                <span className="font-medium">{collection.name}</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteCollection(collection.name);
-                  }}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all"
-                  title="Delete collection"
+            collections.map((collection) => {
+              const isSelected = pathname === `/collections/${collection.name}`;
+              return (
+                <Link
+                  key={collection.id}
+                  href={`/collections/${collection.name}`}
+                  className={`flex items-center justify-between p-3 rounded-lg text-slate-900 dark:text-white transition-all group ${isSelected ? 'bg-violet-100 dark:bg-violet-900/30 border-l-4 border-violet-500 dark:border-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                 >
-                  ✕
-                </button>
-              </Link>
-            ))
+                  <span className={`font-medium ${isSelected ? 'text-violet-700 dark:text-violet-300' : ''}`}>{collection.name}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteCollection(collection.name);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all"
+                    title="Delete collection"
+                  >
+                    ✕
+                  </button>
+                </Link>
+              );
+            })
           ) : (
             <div className="p-4 text-center">
               <div className="text-4xl mb-2">📚</div>
@@ -233,7 +237,7 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
       </aside>
 
       {/* 右侧内容区域，渲染子页面 */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 h-full overflow-y-auto">
         {children}
 
         {/* 创建集合抽屉 */}
