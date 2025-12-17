@@ -9,6 +9,7 @@ import Drawer from '../components/Drawer';
 import type { Collection } from 'chromadb';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Icon } from '@iconify/react';
 
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {
   // 状态管理
@@ -178,17 +179,17 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
               <button
                 onClick={fetchCollections}
                 disabled={loading}
-                className="p-1.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                className="p-1.5 rounded border border-slate-300 dark:border-slate-600 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition-colors"
                 title="Refresh collections"
               >
-                {loading ? <LoadingSpinner size="sm" /> : "🔄"}
+                {loading ? <LoadingSpinner size="sm" /> : <Icon icon="material-symbols:refresh" />}
               </button>
               <button
                 onClick={openCreateDrawer}
-                className="p-1.5 rounded cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                className="p-1.5 rounded border border-slate-300 dark:border-slate-600 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition-colors"
                 title="Create collection"
               >
-                ➕
+                <Icon icon="material-symbols:add" />
               </button>
             </div>
           </div>
@@ -205,9 +206,9 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
                 <Link
                   key={collection.id}
                   href={`/collections/${collection.name}`}
-                  className={`flex items-center justify-between p-3 rounded-lg text-slate-900 dark:text-white transition-all group ${isSelected ? 'bg-violet-100 dark:bg-violet-900/30 border-l-4 border-violet-500 dark:border-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                  className={`flex items-center justify-between p-1 rounded-r-lg text-slate-900 dark:text-white transition-all group ${isSelected ? 'bg-violet-100 dark:bg-violet-900/30 border-l-4 border-violet-500 dark:border-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                 >
-                  <span className={`font-medium ${isSelected ? 'text-violet-700 dark:text-violet-300' : ''}`}>{collection.name}</span>
+                  <span className={`font-medium text-sm truncate ${isSelected ? 'text-violet-700 dark:text-violet-300' : ''}`}>{collection.name}</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
