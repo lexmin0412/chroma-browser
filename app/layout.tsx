@@ -34,8 +34,8 @@ export default function RootLayout({
       >
         <div className="flex flex-col h-screen overflow-hidden">
           {/* Top Navigation Bar */}
-          <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
-            <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <header className="relative z-20 h-16 flex items-center bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
+            <div className="w-full px-4 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Image
                   src="/vector-icon.svg"

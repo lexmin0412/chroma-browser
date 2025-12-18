@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
@@ -12,7 +12,7 @@ export default function HomePage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 items-center justify-center">
+    <div className="flex items-center justify-center h-[calc(100vh-4rem)] mt-16 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
       <div className="text-center space-y-6">
         <div className="text-6xl">🗄️</div>
         <div>
