@@ -1,17 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { chromaService } from '../../utils/chroma-service';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import SettingsModal from '../../components/SettingsModal';
-import ConfigManager from '../../utils/config-manager';
+import Notification from './Notification';
+import RecordsTabs from './collection/RecordsTabs';
 import type { GetResult, QueryResult, Metadata } from 'chromadb';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function CollectionDetailQuery({ params: routeParams }: { params: { id: string } }) {
-  const router = useRouter();
   const [collectionName, setCollectionName] = useState('');
 	console.log('collectionName in render', collectionName)
 
@@ -29,7 +27,6 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
 
   // 状态管理
   const [records, setRecords] = useState<GetResult<Metadata> | QueryResult<Metadata> | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -232,7 +229,6 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
     try {
       setQueryingRecords(true);
       setError(null);
-      setLoading(true);
 
       // 准备查询参数
       const nResults = parseInt(queryNResults) || 5;
@@ -317,7 +313,6 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
       }
     } finally {
       setQueryingRecords(false);
-      setLoading(false);
     }
   };
 
@@ -326,7 +321,6 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
     try {
       setFetchingRecords(true);
       setError(null);
-      setLoading(true);
 
       // 准备参数
       const params: {
@@ -391,7 +385,6 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
       }
     } finally {
       setFetchingRecords(false);
-      setLoading(false);
     }
   };
 
@@ -710,10 +703,7 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
     }
   }, [error, success]);
 
-  // 打开设置模态框
-  const openSettingsModal = () => {
-    setIsSettingsModalOpen(true);
-  };
+
 
   // 保存设置后的回调
   const handleSettingsSaved = () => {
@@ -741,18 +731,8 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
         </div>
 
         {/* 通知提示 */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-3 rounded-lg mb-6 shadow-sm">
-            <strong className="font-bold">Error: </strong>
-            <span>{error}</span>
-          </div>
-        )}
-        {success && (
-          <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-300 px-4 py-3 rounded-lg mb-6 shadow-sm">
-            <strong className="font-bold">Success: </strong>
-            <span>{success}</span>
-          </div>
-        )}
+        <Notification type="error" message={error || ''} />
+        <Notification type="success" message={success || ''} />
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
@@ -770,487 +750,82 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
           </div>
 
           <div>
-            {/* 记录管理标签页 */}
-            <div className="mb-6">
-              <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setActiveRecordTab('add')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'add' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                >
-                  Add Records
-                </button>
-                <button
-                  onClick={() => setActiveRecordTab('query')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'query' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                >
-                  Query Records
-                </button>
-                <button
-                  onClick={() => setActiveRecordTab('get')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'get' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                >
-                  Get Records
-                </button>
-                <button
-                  onClick={() => setActiveRecordTab('delete')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'delete' ? 'bg-linear-to-r from-red-600 to-orange-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                >
-                  Delete Records
-                </button>
-                <button
-                  onClick={() => setActiveRecordTab('update')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'update' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                >
-                  Update Records
-                </button>
-                <button
-                  onClick={() => setActiveRecordTab('upsert')}
-                  className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'upsert' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                >
-                  Upsert Records
-                </button>
-              </div>
-            </div>
-
             {/* 记录管理内容 */}
             <div className="space-y-6">
-              {/* 添加记录 */}
-              {activeRecordTab === 'add' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="recordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Record IDs (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        id="recordIds"
-                        value={newRecordIds}
-                        onChange={(e) => setNewRecordIds(e.target.value)}
-                        placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={addingRecords}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="recordEmbeddings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Embeddings (JSON array)
-                      </label>
-                      <input
-                        type="text"
-                        id="recordEmbeddings"
-                        value={newRecordEmbeddings}
-                        onChange={(e) => setNewRecordEmbeddings(e.target.value)}
-                        placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={addingRecords}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="recordMetadatas" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Metadatas (JSON array)
-                      </label>
-                      <input
-                        type="text"
-                        id="recordMetadatas"
-                        value={newRecordMetadatas}
-                        onChange={(e) => setNewRecordMetadatas(e.target.value)}
-                        placeholder='e.g., [{"name": "doc1"}, {"name": "doc2"}]'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={addingRecords}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="recordDocuments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Documents (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        id="recordDocuments"
-                        value={newRecordDocuments}
-                        onChange={(e) => setNewRecordDocuments(e.target.value)}
-                        placeholder='e.g., "Document 1", "Document 2"'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={addingRecords}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={addRecords}
-                      disabled={addingRecords || !newRecordIds.trim()}
-                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
-                    >
-                      {addingRecords ? (
-                        <>
-                          <LoadingSpinner size="sm" />
-                          <span className="ml-2">Adding...</span>
-                        </>
-                      ) : 'Add Records'}
-                    </button>
-                  </div>
-                </div>
-              )}
+              <RecordsTabs
+                // Tab state
+                activeRecordTab={activeRecordTab}
+                setActiveRecordTab={setActiveRecordTab}
 
-              {/* 查询记录 */}
-              {activeRecordTab === 'query' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="queryText" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Query Text (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        id="queryText"
-                        value={queryText}
-                        onChange={(e) => setQueryText(e.target.value)}
-                        placeholder='e.g., "apple", "banana"'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={queryingRecords}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="queryEmbedding" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Query Embedding (JSON array)
-                      </label>
-                      <input
-                        type="text"
-                        id="queryEmbedding"
-                        value={queryEmbedding}
-                        onChange={(e) => setQueryEmbedding(e.target.value)}
-                        placeholder='e.g., [0.1, 0.2, 0.3]'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={queryingRecords}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="queryNResults" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Number of Results
-                      </label>
-                      <input
-                        type="number"
-                        id="queryNResults"
-                        value={queryNResults}
-                        onChange={(e) => setQueryNResults(e.target.value)}
-                        min="1"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={queryingRecords}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="queryWhere" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Where Filter (JSON)
-                      </label>
-                      <input
-                        type="text"
-                        id="queryWhere"
-                        value={queryWhere}
-                        onChange={(e) => setQueryWhere(e.target.value)}
-                        placeholder='e.g., {"name": "apple"}'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={queryingRecords}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={queryRecords}
-                      disabled={queryingRecords || (!queryText.trim() && !queryEmbedding.trim())}
-                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
-                    >
-                      {queryingRecords ? (
-                        <>
-                          <LoadingSpinner size="sm" />
-                          <span className="ml-2">Querying...</span>
-                        </>
-                      ) : 'Query Records'}
-                    </button>
-                  </div>
-                </div>
-              )}
+                // Add records props
+                addingRecords={addingRecords}
+                newRecordIds={newRecordIds}
+                newRecordEmbeddings={newRecordEmbeddings}
+                newRecordMetadatas={newRecordMetadatas}
+                newRecordDocuments={newRecordDocuments}
+                onNewRecordIdsChange={setNewRecordIds}
+                onNewRecordEmbeddingsChange={setNewRecordEmbeddings}
+                onNewRecordMetadatasChange={setNewRecordMetadatas}
+                onNewRecordDocumentsChange={setNewRecordDocuments}
+                onAddRecords={addRecords}
 
-              {/* 获取记录 */}
-              {activeRecordTab === 'get' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="getRecordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Record IDs (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        id="getRecordIds"
-                        value={getRecordIds}
-                        onChange={(e) => setGetRecordIds(e.target.value)}
-                        placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={fetchingRecords}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="getRecordLimit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Limit
-                      </label>
-                      <input
-                        type="number"
-                        id="getRecordLimit"
-                        value={getRecordLimit}
-                        onChange={(e) => setGetRecordLimit(e.target.value)}
-                        min="1"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={fetchingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="getRecordWhere" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Where Filter (JSON)
-                      </label>
-                      <input
-                        type="text"
-                        id="getRecordWhere"
-                        value={getRecordWhere}
-                        onChange={(e) => setGetRecordWhere(e.target.value)}
-                        placeholder='e.g., {"name": {"$eq": "apple"}}'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={fetchingRecords}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={getRecords}
-                      disabled={fetchingRecords}
-                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
-                    >
-                      {fetchingRecords ? (
-                        <>
-                          <LoadingSpinner size="sm" />
-                          <span className="ml-2">Fetching...</span>
-                        </>
-                      ) : 'Get Records'}
-                    </button>
-                  </div>
-                </div>
-              )}
+                // Query records props
+                queryingRecords={queryingRecords}
+                queryText={queryText}
+                queryEmbedding={queryEmbedding}
+                queryNResults={queryNResults}
+                queryWhere={queryWhere}
+                onQueryTextChange={setQueryText}
+                onQueryEmbeddingChange={setQueryEmbedding}
+                onQueryNResultsChange={setQueryNResults}
+                onQueryWhereChange={setQueryWhere}
+                onQueryRecords={queryRecords}
 
-              {/* 删除记录 */}
-              {activeRecordTab === 'delete' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="deleteRecordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Record IDs (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        id="deleteRecordIds"
-                        value={deleteRecordIds}
-                        onChange={(e) => setDeleteRecordIds(e.target.value)}
-                        placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={deletingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="deleteRecordWhere" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Where Filter (JSON)
-                      </label>
-                      <input
-                        type="text"
-                        id="deleteRecordWhere"
-                        value={deleteRecordWhere}
-                        onChange={(e) => setDeleteRecordWhere(e.target.value)}
-                        placeholder='e.g., {"name": "apple"}'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={deletingRecords}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={deleteRecords}
-                      disabled={deletingRecords || (!deleteRecordIds.trim() && !deleteRecordWhere.trim())}
-                      className="px-4 py-2 bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:from-red-400 disabled:to-orange-400 shadow-lg hover:shadow-xl hover:shadow-orange-500/30 disabled:shadow-none flex items-center"
-                    >
-                      {deletingRecords ? (
-                        <>
-                          <LoadingSpinner size="sm" />
-                          <span className="ml-2">Deleting...</span>
-                        </>
-                      ) : 'Delete Records'}
-                    </button>
-                  </div>
-                </div>
-              )}
+                // Get records props
+                fetchingRecords={fetchingRecords}
+                getRecordIds={getRecordIds}
+                getRecordLimit={getRecordLimit}
+                getRecordWhere={getRecordWhere}
+                onGetRecordIdsChange={setGetRecordIds}
+                onGetRecordLimitChange={setGetRecordLimit}
+                onGetRecordWhereChange={setGetRecordWhere}
+                onGetRecords={getRecords}
 
-              {/* 更新记录 */}
-              {activeRecordTab === 'update' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="col-span-2">
-                      <label htmlFor="updateRecordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Record IDs (comma separated)*
-                      </label>
-                      <input
-                        type="text"
-                        id="updateRecordIds"
-                        value={updateRecordIds}
-                        onChange={(e) => setUpdateRecordIds(e.target.value)}
-                        placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={updatingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="updateRecordEmbeddings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Embeddings (JSON array of arrays)
-                      </label>
-                      <input
-                        type="text"
-                        id="updateRecordEmbeddings"
-                        value={updateRecordEmbeddings}
-                        onChange={(e) => setUpdateRecordEmbeddings(e.target.value)}
-                        placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={updatingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="updateRecordMetadatas" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Metadatas (JSON array of objects)
-                      </label>
-                      <input
-                        type="text"
-                        id="updateRecordMetadatas"
-                        value={updateRecordMetadatas}
-                        onChange={(e) => setUpdateRecordMetadatas(e.target.value)}
-                        placeholder='e.g., [{"key1": "value1"}, {"key2": "value2"}]'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={updatingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="updateRecordDocuments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Documents (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        id="updateRecordDocuments"
-                        value={updateRecordDocuments}
-                        onChange={(e) => setUpdateRecordDocuments(e.target.value)}
-                        placeholder="e.g., document1, document2"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={updatingRecords}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={updateRecords}
-                      disabled={updatingRecords || !updateRecordIds.trim()}
-                      className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all disabled:from-violet-400 disabled:to-purple-400 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 disabled:shadow-none flex items-center"
-                    >
-                      {updatingRecords ? (
-                        <>
-                          <LoadingSpinner size="sm" />
-                          <span className="ml-2">Updating...</span>
-                        </>
-                      ) : 'Update Records'}
-                    </button>
-                  </div>
-                </div>
-              )}
+                // Delete records props
+                deletingRecords={deletingRecords}
+                deleteRecordIds={deleteRecordIds}
+                deleteRecordWhere={deleteRecordWhere}
+                onDeleteRecordIdsChange={setDeleteRecordIds}
+                onDeleteRecordWhereChange={setDeleteRecordWhere}
+                onDeleteRecords={deleteRecords}
 
-              {/* 插入更新记录 */}
-              {activeRecordTab === 'upsert' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="col-span-2">
-                      <label htmlFor="upsertRecordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Record IDs (comma separated)*
-                      </label>
-                      <input
-                        type="text"
-                        id="upsertRecordIds"
-                        value={upsertRecordIds}
-                        onChange={(e) => setUpsertRecordIds(e.target.value)}
-                        placeholder="e.g., id1, id2, id3"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={upsertingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="upsertRecordEmbeddings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Embeddings (JSON array of arrays)
-                      </label>
-                      <input
-                        type="text"
-                        id="upsertRecordEmbeddings"
-                        value={upsertRecordEmbeddings}
-                        onChange={(e) => setUpsertRecordEmbeddings(e.target.value)}
-                        placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={upsertingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="upsertRecordMetadatas" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Metadatas (JSON array of objects)
-                      </label>
-                      <input
-                        type="text"
-                        id="upsertRecordMetadatas"
-                        value={upsertRecordMetadatas}
-                        onChange={(e) => setUpsertRecordMetadatas(e.target.value)}
-                        placeholder='e.g., [{"key1": "value1"}, {"key2": "value2"}]'
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={upsertingRecords}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <label htmlFor="upsertRecordDocuments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Documents (comma separated)
-                      </label>
-                      <input
-                        type="text"
-                        id="upsertRecordDocuments"
-                        value={upsertRecordDocuments}
-                        onChange={(e) => setUpsertRecordDocuments(e.target.value)}
-                        placeholder="e.g., document1, document2"
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
-                        disabled={upsertingRecords}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={upsertRecords}
-                      disabled={upsertingRecords || !upsertRecordIds.trim()}
-                      className="px-4 py-2 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg font-medium transition-all disabled:from-emerald-400 disabled:to-teal-400 shadow-lg hover:shadow-xl hover:shadow-teal-500/30 disabled:shadow-none flex items-center"
-                    >
-                      {upsertingRecords ? (
-                        <>
-                          <LoadingSpinner size="sm" />
-                          <span className="ml-2">Upserting...</span>
-                        </>
-                      ) : 'Upsert Records'}
-                    </button>
-                  </div>
-                </div>
-              )}
+                // Update records props
+                updatingRecords={updatingRecords}
+                updateRecordIds={updateRecordIds}
+                updateRecordEmbeddings={updateRecordEmbeddings}
+                updateRecordMetadatas={updateRecordMetadatas}
+                updateRecordDocuments={updateRecordDocuments}
+                onUpdateRecordIdsChange={setUpdateRecordIds}
+                onUpdateRecordEmbeddingsChange={setUpdateRecordEmbeddings}
+                onUpdateRecordMetadatasChange={setUpdateRecordMetadatas}
+                onUpdateRecordDocumentsChange={setUpdateRecordDocuments}
+                onUpdateRecords={updateRecords}
 
-              {/* 记录结果显示 */}
-              {records && Object.keys(records).length > 0 && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Query Results</h4>
-                  <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 max-h-96 overflow-y-auto shadow-inner">
-                    <pre className="text-sm text-gray-700 dark:text-gray-300">
-                      {JSON.stringify(records, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              )}
+                // Upsert records props
+                upsertingRecords={upsertingRecords}
+                upsertRecordIds={upsertRecordIds}
+                upsertRecordEmbeddings={upsertRecordEmbeddings}
+                upsertRecordMetadatas={upsertRecordMetadatas}
+                upsertRecordDocuments={upsertRecordDocuments}
+                onUpsertRecordIdsChange={setUpsertRecordIds}
+                onUpsertRecordEmbeddingsChange={setUpsertRecordEmbeddings}
+                onUpsertRecordMetadatasChange={setUpsertRecordMetadatas}
+                onUpsertRecordDocumentsChange={setUpsertRecordDocuments}
+                onUpsertRecords={upsertRecords}
+
+                // Results
+                records={records}
+              />
             </div>
           </div>
         </div>
