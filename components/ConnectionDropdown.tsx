@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { IConnectionItem } from '@/types';
 import ConnectionsManager from './ConnectionsManager';
@@ -17,6 +17,8 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
   const [isManagerOpen, setIsManagerOpen] = useState(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+	const {connectionId} = useParams<{connectionId: string}>()
+  const currentConnection = connections.find(conn => conn.id.toString() === connectionId);
 
   // 点击外部关闭下拉菜单
   useEffect(() => {
@@ -33,6 +35,12 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
   }, []);
 
   const handleConnectionClick = (connection: IConnectionItem) => {
+    // 如果点击的连接和当前连接相同，不做路由跳转
+    if (connection.id.toString() === connectionId) {
+      setIsOpen(false);
+      return;
+    }
+
     // 跳转到 collections 页面并携带 connectionId
     router.push(`/${connection.id}/collections`);
     setIsOpen(false);
@@ -48,7 +56,7 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
       >
-        <span>连接</span>
+        <span>{currentConnection ? currentConnection.name : '连接'}</span>
         <Icon
           icon="heroicons:chevron-down"
           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from 'next/link';
 import Image from 'next/image';
+import { Icon } from '@iconify/react';
 import "./globals.css";
 import ConnectionDropdownWrapper from '../app/ConnectionDropdownWrapper';
 
@@ -48,13 +49,14 @@ export default function RootLayout({
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">Vector DB Browser</h1>
               </div>
               <nav className="flex gap-4 items-center">
-                <Link
-                  href="/collections"
-                  className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
-                >
-                  Collections
-                </Link>
                 <ConnectionDropdownWrapper />
+                <Link
+                  href="https://github.com/lexmin0412/chroma-browser"
+                  className="p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
+                  aria-label="Github Repository"
+                >
+                  <Icon icon="mdi:github" className="w-5 h-5" />
+                </Link>
               </nav>
             </div>
           </header>

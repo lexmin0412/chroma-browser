@@ -14,26 +14,11 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from '@/compo
 
 import type { Collection } from 'chromadb';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Icon } from '@iconify/react';
 
-export default function CollectionsLayout({ children, params }: { children: React.ReactNode, params: Promise<{
-	connectionId: string
-	id: string
-}> }) {
-  // 状态管理
-	const [connectionId, setConnectionId] = useState('')
-
-	const pathname = usePathname()
-	const selectedCollectionId = pathname.slice(pathname.lastIndexOf('/') + 1)
-
-	useEffect(()=>{
-		const init = async() => {
-			const { connectionId, id: collectionId } = await params
-			setConnectionId(connectionId)
-		}
-		init()
-	}, [])
+export default function CollectionsLayout({ children }: { children: React.ReactNode }) {
+	const {id: collectionId, connectionId} = useParams<{id: string, connectionId: string}>()
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -219,8 +204,7 @@ export default function CollectionsLayout({ children, params }: { children: Reac
                 </div>
               ) : collections.length > 0 ? (
                 collections.map((collection) => {
-                  const isSelected = selectedCollectionId === collection.name
-									console.log('collectionId', selectedCollectionId, collection.id)
+                  const isSelected = collectionId === collection.name
                   return (
                     <div key={collection.id} className="group">
                       <Link
@@ -281,6 +265,7 @@ export default function CollectionsLayout({ children, params }: { children: Reac
                 <Label htmlFor="collection-name">Collection Name *</Label>
                 <Input
                   id="collection-name"
+									className='mt-2'
                   value={newCollectionName}
                   onChange={(e) => setNewCollectionName(e.target.value)}
                   placeholder="e.g., my-documents"
@@ -296,7 +281,7 @@ export default function CollectionsLayout({ children, params }: { children: Reac
                   placeholder='{"description": "My collection", "version": "1.0"}'
                   rows={4}
                   disabled={creatingCollection}
-                  className="font-mono text-sm"
+                  className="font-mono text-sm mt-2"
                 />
               </div>
               {error && (
@@ -343,7 +328,7 @@ export default function CollectionsLayout({ children, params }: { children: Reac
             </DialogHeader>
             <div className="py-4">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Are you sure you want to delete the collection "{collectionToDelete}"?
+                {`Are you sure you want to delete the collection "${collectionToDelete}"?`}
               </p>
             </div>
             <DialogFooter>
