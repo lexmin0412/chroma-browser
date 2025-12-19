@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from 'next/link';
 import Image from 'next/image';
 import "./globals.css";
+import ConnectionDropdownWrapper from '../app/ConnectionDropdownWrapper';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,12 +54,7 @@ export default function RootLayout({
                 >
                   Collections
                 </Link>
-                <Link
-                  href="/connections"
-                  className="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
-                >
-                  Connections
-                </Link>
+                <ConnectionDropdownWrapper />
               </nav>
             </div>
           </header>
