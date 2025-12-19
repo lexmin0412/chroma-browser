@@ -51,6 +51,7 @@ export default function RootLayout({
               <nav className="flex gap-4 items-center">
                 <ConnectionDropdownWrapper />
                 <Link
+									target="_blank"
                   href="https://github.com/lexmin0412/chroma-browser"
                   className="p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
                   aria-label="Github Repository"
