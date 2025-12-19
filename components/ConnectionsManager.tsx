@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
-import { chromaService } from "../app/utils/chroma-service";
+import { chromaService } from "@/app/utils/chroma-service";
 import { IConnectionFlatItem, IConnectionItem } from "@/types";
 
 type IFormData = Omit<IConnectionFlatItem, "id">;
@@ -15,6 +15,7 @@ interface ConnectionsManagerProps {
 }
 
 export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect }: ConnectionsManagerProps) {
+  const router = useRouter();
   const [connections, setConnections] = useState<IConnectionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -174,6 +175,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
 
   const handleConnectionClick = (connection: IConnectionItem) => {
     chromaService.setCurrentConnection(connection.id);
+    router.push(`/${connection.id}/collections`);
     onConnectionSelect?.(connection);
     onClose();
   };

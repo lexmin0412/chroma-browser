@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import ConnectionDropdown from '../components/ConnectionDropdown';
+import { useState, useEffect } from 'react';
+import ConnectionDropdown from '@/components/ConnectionDropdown';
 import { IConnectionItem } from '@/types';
 
 export default function ConnectionDropdownWrapper() {

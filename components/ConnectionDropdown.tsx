@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { IConnectionItem } from '@/types';
 import ConnectionsManager from './ConnectionsManager';
@@ -14,6 +15,7 @@ interface ConnectionDropdownProps {
 export default function ConnectionDropdown({ connections, isLoading }: ConnectionDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isManagerOpen, setIsManagerOpen] = useState(false);
+  const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 点击外部关闭下拉菜单
@@ -31,8 +33,8 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
   }, []);
 
   const handleConnectionClick = (connection: IConnectionItem) => {
-    // 这里可以添加切换连接的逻辑
-    console.log('切换到连接:', connection.name);
+    // 跳转到 collections 页面并携带 connectionId
+    router.push(`/${connection.id}/collections`);
     setIsOpen(false);
   };
 
@@ -47,8 +49,8 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
         className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
       >
         <span>连接</span>
-        <Icon 
-          icon="heroicons:chevron-down" 
+        <Icon
+          icon="heroicons:chevron-down"
           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
@@ -65,8 +67,8 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
               }}
               className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors"
             >
-              <Icon 
-                icon="heroicons:cog-6-tooth" 
+              <Icon
+                icon="heroicons:cog-6-tooth"
                 className="w-4 h-4 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               />
             </button>
@@ -104,10 +106,10 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
                     className="w-full px-4 py-2 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center justify-between group"
                   >
                     <div className="flex items-center gap-2">
-                      <Icon 
+                      <Icon
                         icon={
-                          connection.type === 'ChromaCloud' 
-                            ? 'heroicons:cloud' 
+                          connection.type === 'ChromaCloud'
+                            ? 'heroicons:cloud'
                             : 'heroicons:server'
                         }
                         className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200"
@@ -119,8 +121,8 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
                         </div>
                       </div>
                     </div>
-                    <Icon 
-                      icon="heroicons:check" 
+                    <Icon
+                      icon="heroicons:check"
                       className="w-4 h-4 text-transparent group-hover:text-slate-400 dark:group-hover:text-slate-500"
                     />
                   </button>

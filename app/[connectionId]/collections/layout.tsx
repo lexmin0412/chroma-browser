@@ -1,29 +1,42 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { chromaService } from '../utils/chroma-service';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Textarea } from '../../components/ui/textarea';
-import { Alert, AlertDescription } from '../../components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
-import { Spinner } from '../../components/ui/spinner';
-import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '../../components/ui/empty';
-import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from '../../components/ui/sidebar';
+import { chromaService } from '@/app/utils/chroma-service';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Spinner } from '@/components/ui/spinner';
+import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarProvider } from '@/components/ui/sidebar';
 
 import type { Collection } from 'chromadb';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Icon } from '@iconify/react';
 
-export default function CollectionsLayout({ children }: { children: React.ReactNode }) {
+export default function CollectionsLayout({ children, params }: { children: React.ReactNode, params: Promise<{
+	connectionId: string
+	id: string
+}> }) {
   // 状态管理
+	const [connectionId, setConnectionId] = useState('')
+
+	const pathname = usePathname()
+	const selectedCollectionId = pathname.slice(pathname.lastIndexOf('/') + 1)
+
+	useEffect(()=>{
+		const init = async() => {
+			const { connectionId, id: collectionId } = await params
+			setConnectionId(connectionId)
+		}
+		init()
+	}, [])
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // 获取当前路径以判断选中的集合
-  const pathname = usePathname();
 
   // 创建集合相关状态
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
@@ -206,11 +219,12 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
                 </div>
               ) : collections.length > 0 ? (
                 collections.map((collection) => {
-                  const isSelected = pathname === `/collections/${collection.name}`;
+                  const isSelected = selectedCollectionId === collection.name
+									console.log('collectionId', selectedCollectionId, collection.id)
                   return (
                     <div key={collection.id} className="group">
                       <Link
-                        href={`/collections/${collection.name}`}
+                        href={`/${connectionId}/collections/${collection.name}`}
                         className={`flex items-center justify-between p-2 rounded-r-lg text-slate-900 dark:text-white transition-all ${isSelected ? 'bg-violet-100 dark:bg-violet-900/30 border-l-4 border-violet-500 dark:border-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                       >
                         <span className={`font-medium text-sm truncate ${isSelected ? 'text-violet-700 dark:text-violet-300' : ''}`}>{collection.name}</span>

@@ -7,7 +7,8 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to collections page by default
+    // Redirect to collections page by default - but collections needs a connectionId
+    // For now, we'll redirect to collections without connectionId, user can select from dropdown
     router.push('/collections');
   }, [router]);
 

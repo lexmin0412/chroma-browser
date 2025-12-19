@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { chromaService } from "../../utils/chroma-service";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import ConfirmationDialog from "../../components/ConfirmationDialog";
-import SettingsModal from "../../components/SettingsModal";
-import ConfigManager from "../../utils/config-manager";
+import { chromaService } from "@/app/utils/chroma-service";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
+import ConfirmationDialog from "@/app/components/ConfirmationDialog";
+import SettingsModal from "@/app/components/SettingsModal";
+import ConfigManager from "@/app/utils/config-manager";
 import type { GetResult, QueryResult, Metadata } from "chromadb";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
