@@ -148,19 +148,19 @@ const RecordsTabs: React.FC<RecordsTabsProps> = ({
         <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => setActiveRecordTab('add')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'add' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'add' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
           >
             Add Records
           </button>
           <button
             onClick={() => setActiveRecordTab('query')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'query' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'query' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
           >
             Query Records
           </button>
           <button
             onClick={() => setActiveRecordTab('get')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'get' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'get' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
           >
             Get Records
           </button>
@@ -172,13 +172,13 @@ const RecordsTabs: React.FC<RecordsTabsProps> = ({
           </button>
           <button
             onClick={() => setActiveRecordTab('update')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'update' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'update' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
           >
             Update Records
           </button>
           <button
             onClick={() => setActiveRecordTab('upsert')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'upsert' ? 'bg-linear-to-r from-violet-600 to-purple-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'upsert' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
           >
             Upsert Records
           </button>

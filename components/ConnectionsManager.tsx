@@ -214,7 +214,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
               </h4>
               <button
                 onClick={handleAddConnection}
-                className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl"
+                className="px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl"
               >
                 Add Connection
               </button>
@@ -319,7 +319,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                 </p>
                 <button
                   onClick={handleAddConnection}
-                  className="mt-4 px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all"
+                  className="mt-4 px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all"
                 >
                   Add Your First Connection
                 </button>
@@ -357,7 +357,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                           value={formData?.name || ""}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                         />
                       </div>
 
@@ -370,7 +370,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                           value={formData?.type || "ChromaNormal"}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                         >
                           <option value="ChromaNormal">Chroma Normal</option>
                           <option value="ChromaCloud">Chroma Cloud</option>
@@ -389,7 +389,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                               value={formData?.host || ""}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                             />
                           </div>
 
@@ -405,7 +405,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                               required
                               min="1"
                               max="65535"
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                             />
                           </div>
                         </>
@@ -421,7 +421,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                               value={formData?.apiKey || ""}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                             />
                           </div>
 
@@ -435,7 +435,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                               value={formData?.tenant || ""}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                             />
                           </div>
 
@@ -449,7 +449,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                               value={formData?.database || ""}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                             />
                           </div>
                         </>
@@ -464,7 +464,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                           value={formData?.description || ""}
                           onChange={handleInputChange}
                           rows={3}
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                         />
                       </div>
                     </div>
@@ -479,7 +479,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
                       </button>
                       <button
                         type="submit"
-                        className="px-4 py-2 bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all"
+                        className="px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all"
                       >
                         Save
                       </button>

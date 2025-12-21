@@ -39,7 +39,7 @@ const UpsertRecordsTab: React.FC<UpsertRecordsTabProps> = ({
             value={upsertRecordIds}
             onChange={(e) => onIdsChange(e.target.value)}
             placeholder="e.g., id1, id2, id3"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>
@@ -53,7 +53,7 @@ const UpsertRecordsTab: React.FC<UpsertRecordsTabProps> = ({
             value={upsertRecordEmbeddings}
             onChange={(e) => onEmbeddingsChange(e.target.value)}
             placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>
@@ -67,7 +67,7 @@ const UpsertRecordsTab: React.FC<UpsertRecordsTabProps> = ({
             value={upsertRecordMetadatas}
             onChange={(e) => onMetadatasChange(e.target.value)}
             placeholder='e.g., [{"key1": "value1"}, {"key2": "value2"}]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>
@@ -81,7 +81,7 @@ const UpsertRecordsTab: React.FC<UpsertRecordsTabProps> = ({
             value={upsertRecordDocuments}
             onChange={(e) => onDocumentsChange(e.target.value)}
             placeholder="e.g., document1, document2"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>

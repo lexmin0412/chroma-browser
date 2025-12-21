@@ -18,6 +18,15 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Icon } from "@iconify/react";
 import CollectionDetailQuery from "./query";
 
 export default function CollectionDetailPage({
@@ -35,6 +44,7 @@ export default function CollectionDetailPage({
 	const [activeTab, setActiveTab] = useState("view");
 	const [recordCount, setRecordCount] = useState(0);
 	const [recordsLoading, setRecordsLoading] = useState(false);
+	const [selectedRecordIndex, setSelectedRecordIndex] = useState<number | null>(null);
 
 	// 设置相关状态
 	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -250,11 +260,23 @@ export default function CollectionDetailPage({
 								<TableBody>
 									{records && records.ids && records.ids.length > 0 ? (
 										records.ids.map((id, index) => (
-											<TableRow key={id}>
-												<TableCell className="font-medium">{id}</TableCell>
+											<TableRow
+												key={Array.isArray(id) ? id.join("-") : id}
+												className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors group"
+												onClick={() => setSelectedRecordIndex(index)}
+											>
+												<TableCell className="font-medium">
+													<div className="flex items-center gap-2">
+														{Array.isArray(id) ? id.join(", ") : id}
+														<Icon
+															icon="heroicons:chevron-right"
+															className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-all transform translate-x-0 group-hover:translate-x-1"
+														/>
+													</div>
+												</TableCell>
 												<TableCell>
 													{records.documents && records.documents[index] ? (
-														<div className="max-w-xs truncate">
+														<div className="max-w-xs truncate text-slate-600 dark:text-slate-400">
 															{records.documents[index]}
 														</div>
 													) : (
@@ -263,7 +285,7 @@ export default function CollectionDetailPage({
 												</TableCell>
 												<TableCell>
 													{records.metadatas && records.metadatas[index] ? (
-														<div className="max-w-xs truncate">
+														<div className="truncate max-w-[200px] text-sm text-slate-600 dark:text-slate-400 font-mono">
 															{JSON.stringify(records.metadatas[index])}
 														</div>
 													) : (
@@ -272,7 +294,7 @@ export default function CollectionDetailPage({
 												</TableCell>
 												<TableCell>
 													{records.embeddings && records.embeddings[index] ? (
-														<div className="max-w-xs truncate">
+														<div className="max-w-xs truncate text-slate-600 dark:text-slate-400">
 															[
 															{records.embeddings[index].slice(0, 3).join(", ")}
 															...]
@@ -300,6 +322,120 @@ export default function CollectionDetailPage({
 					<CollectionDetailQuery params={routeParams} />
 				</TabsContent>
 			</Tabs>
+
+			{/* Record Detail Sheet */}
+			<Sheet
+				open={selectedRecordIndex !== null}
+				onOpenChange={(open) => !open && setSelectedRecordIndex(null)}
+			>
+				<SheetContent className="sm:max-w-2xl flex flex-col h-full overflow-hidden p-0">
+					{selectedRecordIndex !== null && records && (
+						<>
+							<SheetHeader className="p-6 border-b bg-slate-50/50 dark:bg-slate-900/50">
+								<SheetTitle className="flex items-center gap-2 text-xl">
+									<Icon icon="heroicons:document-text" className="w-6 h-6 text-slate-500" />
+									Record Details
+								</SheetTitle>
+								<SheetDescription>
+									Full details for record ID:{" "}
+									<span className="font-mono text-sm bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-900 dark:text-slate-100">
+										{Array.isArray(records.ids[selectedRecordIndex])
+											? (records.ids[selectedRecordIndex] as string[]).join(", ")
+											: (records.ids[selectedRecordIndex] as string)}
+									</span>
+								</SheetDescription>
+							</SheetHeader>
+
+							<div className="flex-1 overflow-y-auto p-6 space-y-8">
+								{/* Document Section */}
+								<section className="space-y-3">
+									<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+										<Icon icon="heroicons:bars-3-bottom-left" className="w-4 h-4" />
+										Document Content
+									</h3>
+									<div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap break-words min-h-[100px]">
+										{records.documents?.[selectedRecordIndex] || (
+											<span className="text-slate-400 italic">No document content</span>
+										)}
+									</div>
+								</section>
+
+								{/* Metadata Section */}
+								<section className="space-y-3">
+									<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+										<Icon icon="heroicons:tag" className="w-4 h-4" />
+										Metadata Fields
+									</h3>
+									{records.metadatas?.[selectedRecordIndex] ? (
+										<div className="grid grid-cols-1 gap-2">
+											{Object.entries(records.metadatas[selectedRecordIndex] as Record<string, string | number | boolean>).map(
+												([key, value]) => (
+													<div
+														key={key}
+														className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
+													>
+														<span className="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider sm:w-1/3 shrink-0">
+															{key}
+														</span>
+														<span className="text-sm text-slate-700 dark:text-slate-300 break-all font-mono">
+															{typeof value === "object"
+																? JSON.stringify(value)
+																: String(value)}
+														</span>
+													</div>
+												)
+											)}
+										</div>
+									) : (
+										<div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-sm text-slate-400 italic">
+											No metadata available
+										</div>
+									)}
+								</section>
+
+								{/* Embeddings Section */}
+								<section className="space-y-3">
+									<div className="flex items-center justify-between">
+										<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+											<Icon icon="heroicons:variable" className="w-4 h-4" />
+											Embeddings
+										</h3>
+										{records.embeddings?.[selectedRecordIndex] && (
+											<span className="text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+												Dimension: {records.embeddings[selectedRecordIndex].length}
+											</span>
+										)}
+									</div>
+									<div className="bg-slate-950 text-slate-300 p-4 rounded-lg font-mono text-xs overflow-x-auto leading-relaxed border border-slate-800">
+										{records.embeddings?.[selectedRecordIndex] ? (
+											<div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+												{(records.embeddings[selectedRecordIndex] as (number | number[])[]).map((val, i) => (
+													<span key={i} className="hover:text-white transition-colors">
+														{Array.isArray(val)
+															? `[${val.slice(0, 2).join(", ")}...]`
+															: (val as number)?.toFixed?.(4) ?? val}
+													</span>
+												))}
+											</div>
+										) : (
+											<span className="text-slate-600 italic">No embeddings available</span>
+										)}
+									</div>
+								</section>
+							</div>
+
+							<div className="p-4 border-t bg-slate-50/50 dark:bg-slate-900/50 flex justify-end">
+								<button
+									onClick={() => setSelectedRecordIndex(null)}
+									className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
+								>
+									Close
+								</button>
+							</div>
+						</>
+					)}
+				</SheetContent>
+			</Sheet>
 		</div>
 	);
 }

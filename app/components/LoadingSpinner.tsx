@@ -35,7 +35,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   return (
     <div className={containerClasses}>
-      <div className={`${sizeClasses[size]} ${borderSizeClasses[size]} border-violet-600 dark:border-violet-400 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin`}></div>
+      <div className={`${sizeClasses[size]} ${borderSizeClasses[size]} border-indigo-600 dark:border-indigo-400 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin`}></div>
       {message && (
         <p className={`mt-3 ${textSizeClasses[size]} text-slate-600 dark:text-slate-300 font-medium`}>
           {message}

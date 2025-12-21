@@ -31,7 +31,7 @@ const DeleteRecordsTab: React.FC<DeleteRecordsTabProps> = ({
             value={deleteRecordIds}
             onChange={(e) => onIdsChange(e.target.value)}
             placeholder="e.g., id1, id2, id3"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={deletingRecords}
           />
         </div>
@@ -45,7 +45,7 @@ const DeleteRecordsTab: React.FC<DeleteRecordsTabProps> = ({
             value={deleteRecordWhere}
             onChange={(e) => onWhereChange(e.target.value)}
             placeholder='e.g., {"name": "apple"}'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={deletingRecords}
           />
         </div>

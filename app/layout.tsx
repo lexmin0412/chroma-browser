@@ -38,16 +38,16 @@ export default function RootLayout({
           {/* Top Navigation Bar */}
           <header className="relative z-20 h-16 flex items-center bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
             <div className="w-full px-4 flex justify-between items-center">
-              <div className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <Image
                   src="/vector-icon.svg"
                   alt="Vector Icon"
                   width={24}
                   height={24}
-                  className="text-violet-600"
+                  className="text-slate-900 dark:text-white"
                 />
                 <h1 className="text-xl font-bold text-slate-900 dark:text-white">Vector DB Browser</h1>
-              </div>
+              </Link>
               <nav className="flex gap-4 items-center">
                 <ConnectionDropdownWrapper />
                 <Link

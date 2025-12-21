@@ -98,7 +98,7 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
                 </p>
                 <Link
                   href="/connections"
-                  className="inline-flex items-center gap-1 mt-2 text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
+                  className="inline-flex items-center gap-1 mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                   onClick={() => setIsOpen(false)}
                 >
                   <Icon icon="heroicons:plus" className="w-4 h-4" />

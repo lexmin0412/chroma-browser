@@ -209,9 +209,9 @@ export default function CollectionsLayout({ children }: { children: React.ReactN
                     <div key={collection.id} className="group">
                       <Link
                         href={`/${connectionId}/collections/${collection.name}`}
-                        className={`flex items-center justify-between p-2 rounded-r-lg text-slate-900 dark:text-white transition-all ${isSelected ? 'bg-violet-100 dark:bg-violet-900/30 border-l-4 border-violet-500 dark:border-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                        className={`flex items-center justify-between p-2 rounded-r-lg text-slate-900 dark:text-white transition-all ${isSelected ? 'bg-indigo-100 dark:bg-indigo-900/30 border-l-4 border-indigo-500 dark:border-indigo-400' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
                       >
-                        <span className={`font-medium text-sm truncate ${isSelected ? 'text-violet-700 dark:text-violet-300' : ''}`}>{collection.name}</span>
+                        <span className={`font-medium text-sm truncate ${isSelected ? 'text-indigo-700 dark:text-indigo-300' : ''}`}>{collection.name}</span>
                         <Button
                           variant="ghost"
                           size="icon"

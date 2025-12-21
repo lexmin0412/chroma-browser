@@ -21,7 +21,7 @@ export default function CollectionsPage() {
   const [connections, setConnections] = useState<IConnectionItem[]>([]);
   const [currentConnectionId, setCurrentConnectionId] = useState<number | null>(null);
   const [currentConnection, setCurrentConnection] = useState<IConnectionItem | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // 获取连接列表
