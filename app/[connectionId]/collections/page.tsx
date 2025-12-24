@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Icon } from '@iconify/react';
@@ -15,8 +15,8 @@ interface Collection {
 }
 
 export default function CollectionsPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
+	const { connectionId } = useParams<{ connectionId: string }>()
   const [collections, setCollections] = useState<Collection[]>([]);
   const [connections, setConnections] = useState<IConnectionItem[]>([]);
   const [currentConnectionId, setCurrentConnectionId] = useState<number | null>(null);
@@ -43,29 +43,35 @@ export default function CollectionsPage() {
     fetchConnections();
   }, []);
 
-  // 监听 searchParams 中的 connectionId 变化
+  // 初始化连接并获取集合列表
   useEffect(() => {
-    const initializeConnection = async (connectionId: number) => {
+    const initializeConnection = async (connId: number) => {
       try {
         setIsLoading(true);
         setError(null);
 
         // 设置当前连接
-        chromaService.setCurrentConnection(connectionId);
+        chromaService.setCurrentConnection(connId);
 
         // 获取当前连接信息
-        const connection = connections.find(conn => conn.id === connectionId);
+        const connection = connections.find(conn => conn.id === connId);
         if (connection) {
           setCurrentConnection(connection);
         }
 
         // 获取集合列表
-        const response = await fetch(`/api/collections?connectionId=${connectionId}`);
+        const response = await fetch(`/api/collections?connectionId=${connId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch collections");
         }
         const data = await response.json();
-        setCollections(data);
+        const collectionsList = data.collections || [];
+        setCollections(collectionsList);
+
+        // 如果集合列表不为空，自动跳转到第一个集合
+        if (collectionsList.length > 0) {
+          router.replace(`/${connId}/collections/${collectionsList[0].name}`);
+        }
       } catch (err) {
         setError("Failed to initialize connection or fetch collections");
         console.error("Error initializing connection:", err);
@@ -74,16 +80,14 @@ export default function CollectionsPage() {
       }
     };
 
-    const connectionIdParam = searchParams.get('connectionId');
-
-    if (connectionIdParam) {
-      const connectionId = parseInt(connectionIdParam, 10);
-      if (!isNaN(connectionId) && connectionId !== currentConnectionId) {
-        setCurrentConnectionId(connectionId);
-        initializeConnection(connectionId);
+    if (connectionId) {
+      const connId = parseInt(connectionId, 10);
+      if (!isNaN(connId)) {
+        setCurrentConnectionId(connId);
+        initializeConnection(connId);
       }
     }
-  }, [searchParams, currentConnectionId, connections]);
+  }, [connectionId, connections, router]);
 
   return (
     <div className="flex-1 overflow-y-auto">
