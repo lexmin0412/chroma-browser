@@ -1,5 +1,8 @@
 import React from 'react';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 interface GetRecordsTabProps {
   fetchingRecords: boolean;
@@ -25,62 +28,53 @@ const GetRecordsTab: React.FC<GetRecordsTabProps> = ({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="getRecordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Record IDs (comma separated)
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="getRecordIds">Record IDs (comma separated)</Label>
+          <Input
             type="text"
             id="getRecordIds"
             value={getRecordIds}
             onChange={(e) => onIdsChange(e.target.value)}
             placeholder="e.g., id1, id2, id3"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={fetchingRecords}
           />
         </div>
-        <div>
-          <label htmlFor="getRecordLimit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Limit
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="getRecordLimit">Limit</Label>
+          <Input
             type="number"
             id="getRecordLimit"
             value={getRecordLimit}
             onChange={(e) => onLimitChange(e.target.value)}
             min="1"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={fetchingRecords}
           />
         </div>
-        <div className="col-span-2">
-          <label htmlFor="getRecordWhere" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Where Filter (JSON)
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="getRecordWhere">Where Filter (JSON)</Label>
+          <Input
             type="text"
             id="getRecordWhere"
             value={getRecordWhere}
             onChange={(e) => onWhereChange(e.target.value)}
             placeholder='e.g., {"name": {"$eq": "apple"}}'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={fetchingRecords}
           />
         </div>
       </div>
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={onSubmit}
           disabled={fetchingRecords}
-          className="px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all disabled:from-indigo-400 disabled:to-blue-400 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none flex items-center"
+          className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transition-all"
         >
           {fetchingRecords ? (
             <>
-              <LoadingSpinner size="sm" />
-              <span className="ml-2">Fetching...</span>
+              <Spinner className="mr-2 h-4 w-4" />
+              <span>Fetching...</span>
             </>
           ) : 'Get Records'}
-        </button>
+        </Button>
       </div>
     </div>
   );

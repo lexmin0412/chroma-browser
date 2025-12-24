@@ -46,26 +46,6 @@ export default function CollectionDetailPage({
 	const [recordsLoading, setRecordsLoading] = useState(false);
 	const [selectedRecordIndex, setSelectedRecordIndex] = useState<number | null>(null);
 
-	// 设置相关状态
-	const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-
-	// 记录管理相关状态
-	const [activeRecordTab, setActiveRecordTab] = useState("add");
-
-	// 添加记录状态
-	const [addingRecords, setAddingRecords] = useState(false);
-	const [newRecordIds, setNewRecordIds] = useState("");
-	const [newRecordEmbeddings, setNewRecordEmbeddings] = useState("");
-	const [newRecordMetadatas, setNewRecordMetadatas] = useState("");
-	const [newRecordDocuments, setNewRecordDocuments] = useState("");
-
-	// 查询记录状态
-	const [queryingRecords, setQueryingRecords] = useState(false);
-	const [queryText, setQueryText] = useState("");
-	const [queryEmbedding, setQueryEmbedding] = useState("");
-	const [queryNResults, setQueryNResults] = useState("5");
-	const [queryWhere, setQueryWhere] = useState("");
-
 	// 获取记录状态
 	const [fetchingRecords, setFetchingRecords] = useState(false);
 	const [getRecordIds, setGetRecordIds] = useState("");
@@ -126,10 +106,6 @@ export default function CollectionDetailPage({
 	}, [routeParams]);
 
 	// 清空通知
-	const clearNotifications = () => {
-		setError(null);
-		setSuccess(null);
-	};
 
 	// 获取集合记录数量
 	const fetchRecordCount = async (name: string = collectionName) => {
@@ -233,24 +209,24 @@ export default function CollectionDetailPage({
 	}, [collectionName]);
 
 	return (
-		<div className="container mx-auto p-4">
-			<h1 className="text-2xl font-bold mb-4">Collection {collectionName}</h1>
+		<div className="w-full h-full flex flex-col p-4 space-y-4">
+			<h1 className="text-2xl font-bold shrink-0">Collection {collectionName}</h1>
 
-			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-				<TabsList>
+			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col overflow-hidden min-h-0">
+				<TabsList className="shrink-0">
 					<TabsTrigger value="view">View</TabsTrigger>
 					<TabsTrigger value="query">Query</TabsTrigger>
 				</TabsList>
-				<TabsContent value="view">
+				<TabsContent value="view" className="flex-1 overflow-hidden data-[state=active]:flex mt-2">
 					{loading ? (
 						<LoadingSpinner />
 					) : error ? (
 						<div className="text-red-500 mb-4">{error}</div>
 					) : (
-						<div className="overflow-x-auto">
-							<Table>
-								<TableHeader>
-									<TableRow>
+						<div className="w-full overflow-hidden rounded-md relative">
+							<Table className="w-full overflow-hidden [&_td]:border-r [&_th]:border-r [&_td:last-child]:border-r-0 [&_th:last-child]:border-r-0">
+								<TableHeader className="sticky top-0 bg-slate-50 dark:bg-slate-950 z-10 shadow-sm">
+									<TableRow className="hover:bg-transparent">
 										<TableHead>ID</TableHead>
 										<TableHead>Document</TableHead>
 										<TableHead>Metadata</TableHead>
@@ -262,7 +238,7 @@ export default function CollectionDetailPage({
 										records.ids.map((id, index) => (
 											<TableRow
 												key={Array.isArray(id) ? id.join("-") : id}
-												className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors group"
+												className="cursor-pointer transition-colors group even:bg-slate-50 dark:even:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/60"
 												onClick={() => setSelectedRecordIndex(index)}
 											>
 												<TableCell className="font-medium">
@@ -317,8 +293,8 @@ export default function CollectionDetailPage({
 						</div>
 					)}
 				</TabsContent>
-				<TabsContent value="query">
-					{/* 这里将集成 page copy.tsx 中的内容 */}
+				<TabsContent value="query" className="flex-1 overflow-auto data-[state=active]:block mt-2">
+					{/* 搜索 */}
 					<CollectionDetailQuery params={routeParams} />
 				</TabsContent>
 			</Tabs>

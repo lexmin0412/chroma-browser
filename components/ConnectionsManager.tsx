@@ -2,9 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
-import { Icon } from '@iconify/react';
+import { Loader2, Plus, Trash2, Edit, Server, Cloud, Database, AlertCircle } from 'lucide-react';
 import { chromaService } from "@/app/utils/chroma-service";
-import { IConnectionFlatItem, IConnectionItem } from "@/types";
+import { IConnectionFlatItem, IConnectionItem, IChromaNormalConnectionFlatItem, IChromaCloudConnectionFlatItem } from "@/types";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia, EmptyContent } from "@/components/ui/empty";
+import { cn } from "@/lib/utils";
 
 type IFormData = Omit<IConnectionFlatItem, "id">;
 
@@ -19,7 +30,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
   const [connections, setConnections] = useState<IConnectionItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [view, setView] = useState<'list' | 'form'>('list');
   const [editingConnection, setEditingConnection] = useState<IConnectionItem | null>(null);
   const [formData, setFormData] = useState<Partial<IConnectionFlatItem>>();
 
@@ -42,8 +53,11 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
       }
     };
 
-    fetchConnections();
-  }, []);
+    if (isOpen) {
+      fetchConnections();
+      setView('list'); // Reset view when opening
+    }
+  }, [isOpen]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -56,13 +70,13 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
 
   const handleAddConnection = () => {
     setEditingConnection(null);
-    setFormData(undefined);
-    setIsModalOpen(true);
+    setFormData({ type: "ChromaNormal" });
+    setView('form');
   };
 
   const handleEditConnection = (connection: IConnectionItem) => {
     setEditingConnection(connection);
-    let editingFormData: Partial<IFormData> = {
+    const editingFormData: Partial<IFormData> = {
       name: connection.name,
       type: connection.type,
       description: connection.description,
@@ -80,7 +94,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
       });
     }
     setFormData(editingFormData);
-    setIsModalOpen(true);
+    setView('form');
   };
 
   const handleDeleteConnection = async (id: number) => {
@@ -165,7 +179,7 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
       }
 
       // 关闭模态框并重置表单
-      setIsModalOpen(false);
+      setView('list');
       setEditingConnection(null);
     } catch (err) {
       setError("Failed to save connection");
@@ -180,317 +194,319 @@ export default function ConnectionsManager({ isOpen, onClose, onConnectionSelect
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div
-          className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl transform transition-all w-full max-w-6xl max-h-[90vh] overflow-hidden animate-fade-in"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-            <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
-              连接管理
-            </h3>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              <Icon icon="heroicons:x-mark" className="w-5 h-5 text-slate-500" />
-            </button>
-          </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-7xl h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+        <DialogHeader className="px-6 py-4 border-b">
+          <DialogTitle>
+            {view === 'list' ? 'Connection Manager' : (editingConnection ? 'Edit Connection' : 'Add Connection')}
+          </DialogTitle>
+          <DialogDescription>
+            {view === 'list'
+              ? 'Manage your vector database connections.'
+              : 'Configure connection details.'}
+          </DialogDescription>
+        </DialogHeader>
 
-          {/* Content */}
-          <div className="px-6 py-4 overflow-y-auto max-h-[calc(90vh-8rem)]">
-            <div className="flex justify-between items-center mb-6">
-              <h4 className="text-lg font-medium text-slate-900 dark:text-white">
-                Vector Database Connections
-              </h4>
-              <button
-                onClick={handleAddConnection}
-                className="px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl"
-              >
-                Add Connection
-              </button>
+        <div className="flex-1 overflow-y-auto p-6">
+          {view === 'list' ? (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h4 className="text-lg font-medium text-foreground">
+                  Your Connections
+                </h4>
+                <Button onClick={handleAddConnection}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Connection
+                </Button>
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {isLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Loading...
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[200px]">Name</TableHead>
+                          <TableHead className="w-[120px]">Type</TableHead>
+                          <TableHead className="w-[200px]">Connection Details</TableHead>
+                          <TableHead>Scope (Tenant / DB)</TableHead>
+                          <TableHead className="text-right w-[100px]">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {connections.map((connection) => (
+                          <TableRow
+                            key={connection.id}
+                            className="cursor-pointer hover:bg-muted/50"
+                            onClick={() => handleConnectionClick(connection)}
+                          >
+                            <TableCell className="font-medium">
+                              <div className="flex flex-col">
+                                <span>{connection.name}</span>
+                                {connection.description && (
+                                  <span className="text-xs text-muted-foreground truncate max-w-[180px]">
+                                    {connection.description}
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className={cn(
+                                "inline-flex px-2 py-0.5 rounded-full text-xs font-medium border",
+                                connection.type === "ChromaNormal"
+                                  ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+                                  : "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800"
+                              )}>
+                                {connection.type.replace("Chroma", "")}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {connection.type === "ChromaNormal" ? (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Server className="h-3 w-3 text-muted-foreground" />
+                                  <span>{connection.config?.host}:{connection.config?.port}</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Cloud className="h-3 w-3 text-muted-foreground" />
+                                  <span>Chroma Cloud API</span>
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {connection.type === "ChromaCloud" ? (
+                                <div className="space-y-1 text-xs">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-muted-foreground">Tenant:</span>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span className="font-mono bg-muted/50 px-1 rounded max-w-[120px] truncate block">
+                                          {connection.config?.tenant}
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>{connection.config?.tenant}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-muted-foreground">DB:</span>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span className="font-mono bg-muted/50 px-1 rounded max-w-[120px] truncate block">
+                                          {connection.config?.database}
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>{connection.config?.database}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditConnection(connection);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteConnection(connection.id);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {connections.length === 0 && (
+                    <div className="mt-6">
+                      <Empty>
+                        <EmptyMedia>
+                          <Database className="text-muted-foreground" />
+                        </EmptyMedia>
+                        <EmptyHeader>
+                          <EmptyTitle>No connections configured</EmptyTitle>
+                          <EmptyDescription>
+                            Add your first vector database connection to get started.
+                          </EmptyDescription>
+                        </EmptyHeader>
+                        <EmptyContent>
+                          <Button onClick={handleAddConnection} variant="outline">
+                            Add Your First Connection
+                          </Button>
+                        </EmptyContent>
+                      </Empty>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg mb-6">
-                {error}
-              </div>
-            )}
-
-            {isLoading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Icon icon="heroicons:arrow-path" className="w-5 h-5 animate-spin" />
-                  Loading...
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {connections.map((connection) => (
-                  <div
-                    key={connection.id}
-                    onClick={() => handleConnectionClick(connection)}
-                    className="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-xl hover:cursor-pointer border border-slate-200 dark:border-slate-700"
-                  >
-                    <div className="p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                          {connection.name}
-                        </h3>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            connection.type === "ChromaNormal"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                              : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                          }`}
-                        >
-                          {connection.type.replace("Chroma", "")}
-                        </span>
-                      </div>
-
-                      <div className="space-y-1 text-sm text-slate-600 dark:text-slate-400 mb-4">
-                        {connection.type === "ChromaNormal" && (
-                          <>
-                            <div>
-                              <strong>Host:</strong> {connection.config?.host}
-                            </div>
-                            <div>
-                              <strong>Port:</strong> {connection.config?.port}
-                            </div>
-                          </>
-                        )}
-                        {connection.type === "ChromaCloud" && (
-                          <>
-                            <div>
-                              <strong>Tenant:</strong> {connection.config?.tenant}
-                            </div>
-                            <div>
-                              <strong>Database:</strong> {connection.config?.database}
-                            </div>
-                          </>
-                        )}
-                        {connection.description && (
-                          <div>
-                            <strong>Description:</strong> {connection.description}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditConnection(connection);
-                          }}
-                          className="px-3 py-1 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-sm"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteConnection(connection.id);
-                          }}
-                          className="px-3 py-1 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/20 rounded-lg hover:bg-red-200 dark:hover:bg-red-800/30 transition-colors text-sm"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* 空状态 */}
-            {!isLoading && connections.length === 0 && (
-              <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
-                <p className="text-slate-500 dark:text-slate-400 text-lg">
-                  No connections configured yet
-                </p>
-                <button
-                  onClick={handleAddConnection}
-                  className="mt-4 px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all"
-                >
-                  Add Your First Connection
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* 添加/编辑连接模态框 */}
-          {isModalOpen && (
-            <div className="fixed inset-0 z-60 overflow-y-auto">
-              <div
-                className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-                onClick={() => setIsModalOpen(false)}
-              />
-              <div className="flex min-h-screen items-center justify-center p-4">
-                <div
-                  className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl transform transition-all w-full max-w-lg animate-fade-in"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                      {editingConnection ? "Edit Connection" : "Add Connection"}
-                    </h3>
+          ) : (
+            <div className="max-w-2xl mx-auto">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Name *</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData?.name || ""}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="My Vector DB"
+                    />
                   </div>
 
-                  <form onSubmit={handleSubmit}>
-                    <div className="px-6 py-4 space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          Name *
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={formData?.name || ""}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                        />
-                      </div>
+                  <div className="grid gap-2">
+                    <Label>Connection Type</Label>
+                    <Tabs
+                      value={formData?.type || "ChromaNormal"}
+                      onValueChange={(val) => setFormData((prev) => ({ ...prev, type: val as "ChromaNormal" | "ChromaCloud" }))}
+                      className="w-full"
+                    >
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="ChromaNormal">Normal (Local/Server)</TabsTrigger>
+                        <TabsTrigger value="ChromaCloud">Chroma Cloud</TabsTrigger>
+                      </TabsList>
 
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          Connection Type *
-                        </label>
-                        <select
-                          name="type"
-                          value={formData?.type || "ChromaNormal"}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                        >
-                          <option value="ChromaNormal">Chroma Normal</option>
-                          <option value="ChromaCloud">Chroma Cloud</option>
-                        </select>
-                      </div>
-
-                      {formData?.type === "ChromaNormal" ? (
-                        <>
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                              Host *
-                            </label>
-                            <input
-                              type="text"
-                              name="host"
-                              value={formData?.host || ""}
-                              onChange={handleInputChange}
-                              required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                            />
+                      <div className="mt-4">
+                        <TabsContent value="ChromaNormal" className="mt-0 space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                              <Label htmlFor="host">Host *</Label>
+                              <Input
+                                id="host"
+                                name="host"
+                                value={(formData as Partial<IChromaNormalConnectionFlatItem>)?.host || ""}
+                                onChange={handleInputChange}
+                                required={formData?.type === "ChromaNormal"}
+                                placeholder="localhost"
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <Label htmlFor="port">Port *</Label>
+                              <Input
+                                id="port"
+                                type="number"
+                                name="port"
+                                value={(formData as Partial<IChromaNormalConnectionFlatItem>)?.port || ""}
+                                onChange={handleInputChange}
+                                required={formData?.type === "ChromaNormal"}
+                                min="1"
+                                max="65535"
+                                placeholder="8000"
+                              />
+                            </div>
                           </div>
+                        </TabsContent>
 
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                              Port *
-                            </label>
-                            <input
-                              type="number"
-                              name="port"
-                              value={formData?.port || ""}
-                              onChange={handleInputChange}
-                              required
-                              min="1"
-                              max="65535"
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                            />
-                          </div>
-                        </>
-                      ) : formData?.type === "ChromaCloud" ? (
-                        <>
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                              API Key *
-                            </label>
-                            <input
-                              type="text"
+                        <TabsContent value="ChromaCloud" className="mt-0 space-y-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="apiKey">API Key *</Label>
+                            <Input
+                              id="apiKey"
+                              type="password"
                               name="apiKey"
-                              value={formData?.apiKey || ""}
+                              value={(formData as unknown as IChromaCloudConnectionFlatItem)?.apiKey || ""}
                               onChange={handleInputChange}
-                              required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
+                              required={formData?.type === "ChromaCloud"}
                             />
                           </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                              Tenant *
-                            </label>
-                            <input
-                              type="text"
-                              name="tenant"
-                              value={formData?.tenant || ""}
-                              onChange={handleInputChange}
-                              required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                            />
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                              <Label htmlFor="tenant">Tenant *</Label>
+                              <Input
+                                id="tenant"
+                                name="tenant"
+                                value={(formData as unknown as IChromaCloudConnectionFlatItem)?.tenant || ""}
+                                onChange={handleInputChange}
+                                required={formData?.type === "ChromaCloud"}
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <Label htmlFor="database">Database *</Label>
+                              <Input
+                                id="database"
+                                name="database"
+                                value={(formData as unknown as IChromaCloudConnectionFlatItem)?.database || ""}
+                                onChange={handleInputChange}
+                                required={formData?.type === "ChromaCloud"}
+                              />
+                            </div>
                           </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                              Database *
-                            </label>
-                            <input
-                              type="text"
-                              name="database"
-                              value={formData?.database || ""}
-                              onChange={handleInputChange}
-                              required
-                              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                            />
-                          </div>
-                        </>
-                      ) : null}
-
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          Description (Optional)
-                        </label>
-                        <textarea
-                          name="description"
-                          value={formData?.description || ""}
-                          onChange={handleInputChange}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
-                        />
+                        </TabsContent>
                       </div>
-                    </div>
+                    </Tabs>
+                  </div>
 
-                    <div className="px-6 py-4 bg-slate-50 dark:bg-slate-700/50 flex justify-end space-x-3">
-                      <button
-                        type="button"
-                        onClick={() => setIsModalOpen(false)}
-                        className="px-4 py-2 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors font-medium"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </form>
+                  <div className="grid gap-2">
+                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      value={formData?.description || ""}
+                      onChange={handleInputChange}
+                      rows={3}
+                    />
+                  </div>
                 </div>
-              </div>
+
+                <div className="flex justify-end space-x-3 pt-4 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setView('list')}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                  >
+                    Save Connection
+                  </Button>
+                </div>
+              </form>
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

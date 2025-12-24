@@ -1,5 +1,8 @@
 import React from 'react';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 interface UpdateRecordsTabProps {
   updatingRecords: boolean;
@@ -29,76 +32,64 @@ const UpdateRecordsTab: React.FC<UpdateRecordsTabProps> = ({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="col-span-2">
-          <label htmlFor="updateRecordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Record IDs (comma separated)*
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="updateRecordIds">Record IDs (comma separated)*</Label>
+          <Input
             type="text"
             id="updateRecordIds"
             value={updateRecordIds}
             onChange={(e) => onIdsChange(e.target.value)}
             placeholder="e.g., id1, id2, id3"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={updatingRecords}
           />
         </div>
-        <div className="col-span-2">
-          <label htmlFor="updateRecordEmbeddings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Embeddings (JSON array of arrays)
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="updateRecordEmbeddings">Embeddings (JSON array of arrays)</Label>
+          <Input
             type="text"
             id="updateRecordEmbeddings"
             value={updateRecordEmbeddings}
             onChange={(e) => onEmbeddingsChange(e.target.value)}
             placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={updatingRecords}
           />
         </div>
-        <div className="col-span-2">
-          <label htmlFor="updateRecordMetadatas" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Metadatas (JSON array of objects)
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="updateRecordMetadatas">Metadatas (JSON array of objects)</Label>
+          <Input
             type="text"
             id="updateRecordMetadatas"
             value={updateRecordMetadatas}
             onChange={(e) => onMetadatasChange(e.target.value)}
             placeholder='e.g., [{"key1": "value1"}, {"key2": "value2"}]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={updatingRecords}
           />
         </div>
-        <div className="col-span-2">
-          <label htmlFor="updateRecordDocuments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Documents (comma separated)
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="updateRecordDocuments">Documents (comma separated)</Label>
+          <Input
             type="text"
             id="updateRecordDocuments"
             value={updateRecordDocuments}
             onChange={(e) => onDocumentsChange(e.target.value)}
             placeholder="e.g., document1, document2"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={updatingRecords}
           />
         </div>
       </div>
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={onSubmit}
           disabled={updatingRecords || !updateRecordIds.trim()}
-          className="px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all disabled:from-indigo-400 disabled:to-blue-400 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none flex items-center"
+          className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transition-all"
         >
           {updatingRecords ? (
             <>
-              <LoadingSpinner size="sm" />
-              <span className="ml-2">Updating...</span>
+              <Spinner className="mr-2 h-4 w-4" />
+              <span>Updating...</span>
             </>
           ) : 'Update Records'}
-        </button>
+        </Button>
       </div>
     </div>
   );

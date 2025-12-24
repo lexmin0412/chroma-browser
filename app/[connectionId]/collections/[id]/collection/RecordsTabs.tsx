@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddRecordsTab from './AddRecordsTab';
 import QueryRecordsTab from './QueryRecordsTab';
 import GetRecordsTab from './GetRecordsTab';
@@ -143,135 +144,105 @@ const RecordsTabs: React.FC<RecordsTabsProps> = ({
   records
 }) => {
   return (
-    <div>
-      <div className="mb-6">
-        <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700">
-          <button
-            onClick={() => setActiveRecordTab('add')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'add' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-          >
-            Add Records
-          </button>
-          <button
-            onClick={() => setActiveRecordTab('query')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'query' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-          >
-            Query Records
-          </button>
-          <button
-            onClick={() => setActiveRecordTab('get')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'get' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-          >
-            Get Records
-          </button>
-          <button
-            onClick={() => setActiveRecordTab('delete')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'delete' ? 'bg-linear-to-r from-red-600 to-orange-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-          >
-            Delete Records
-          </button>
-          <button
-            onClick={() => setActiveRecordTab('update')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'update' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-          >
-            Update Records
-          </button>
-          <button
-            onClick={() => setActiveRecordTab('upsert')}
-            className={`px-4 py-2 rounded-t-lg font-medium ${activeRecordTab === 'upsert' ? 'bg-linear-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-          >
-            Upsert Records
-          </button>
+    <div className="space-y-6">
+      <Tabs value={activeRecordTab} onValueChange={setActiveRecordTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto">
+          <TabsTrigger value="add">Add</TabsTrigger>
+          <TabsTrigger value="query">Query</TabsTrigger>
+          <TabsTrigger value="get">Get</TabsTrigger>
+          <TabsTrigger value="delete">Delete</TabsTrigger>
+          <TabsTrigger value="update">Update</TabsTrigger>
+          <TabsTrigger value="upsert">Upsert</TabsTrigger>
+        </TabsList>
+
+        <div className="mt-6">
+          <TabsContent value="add" className="mt-0">
+            <AddRecordsTab
+              addingRecords={addingRecords}
+              newRecordIds={newRecordIds}
+              newRecordEmbeddings={newRecordEmbeddings}
+              newRecordMetadatas={newRecordMetadatas}
+              newRecordDocuments={newRecordDocuments}
+              onIdsChange={onNewRecordIdsChange}
+              onEmbeddingsChange={onNewRecordEmbeddingsChange}
+              onMetadatasChange={onNewRecordMetadatasChange}
+              onDocumentsChange={onNewRecordDocumentsChange}
+              onSubmit={onAddRecords}
+            />
+          </TabsContent>
+
+          <TabsContent value="query" className="mt-0">
+            <QueryRecordsTab
+              queryingRecords={queryingRecords}
+              queryText={queryText}
+              queryEmbedding={queryEmbedding}
+              queryNResults={queryNResults}
+              queryWhere={queryWhere}
+              onQueryTextChange={onQueryTextChange}
+              onQueryEmbeddingChange={onQueryEmbeddingChange}
+              onQueryNResultsChange={onQueryNResultsChange}
+              onQueryWhereChange={onQueryWhereChange}
+              onSubmit={onQueryRecords}
+            />
+          </TabsContent>
+
+          <TabsContent value="get" className="mt-0">
+            <GetRecordsTab
+              fetchingRecords={fetchingRecords}
+              getRecordIds={getRecordIds}
+              getRecordLimit={getRecordLimit}
+              getRecordWhere={getRecordWhere}
+              onIdsChange={onGetRecordIdsChange}
+              onLimitChange={onGetRecordLimitChange}
+              onWhereChange={onGetRecordWhereChange}
+              onSubmit={onGetRecords}
+            />
+          </TabsContent>
+
+          <TabsContent value="delete" className="mt-0">
+            <DeleteRecordsTab
+              deletingRecords={deletingRecords}
+              deleteRecordIds={deleteRecordIds}
+              deleteRecordWhere={deleteRecordWhere}
+              onIdsChange={onDeleteRecordIdsChange}
+              onWhereChange={onDeleteRecordWhereChange}
+              onSubmit={onDeleteRecords}
+            />
+          </TabsContent>
+
+          <TabsContent value="update" className="mt-0">
+            <UpdateRecordsTab
+              updatingRecords={updatingRecords}
+              updateRecordIds={updateRecordIds}
+              updateRecordEmbeddings={updateRecordEmbeddings}
+              updateRecordMetadatas={updateRecordMetadatas}
+              updateRecordDocuments={updateRecordDocuments}
+              onIdsChange={onUpdateRecordIdsChange}
+              onEmbeddingsChange={onUpdateRecordEmbeddingsChange}
+              onMetadatasChange={onUpdateRecordMetadatasChange}
+              onDocumentsChange={onUpdateRecordDocumentsChange}
+              onSubmit={onUpdateRecords}
+            />
+          </TabsContent>
+
+          <TabsContent value="upsert" className="mt-0">
+            <UpsertRecordsTab
+              upsertingRecords={upsertingRecords}
+              upsertRecordIds={upsertRecordIds}
+              upsertRecordEmbeddings={upsertRecordEmbeddings}
+              upsertRecordMetadatas={upsertRecordMetadatas}
+              upsertRecordDocuments={upsertRecordDocuments}
+              onIdsChange={onUpsertRecordIdsChange}
+              onEmbeddingsChange={onUpsertRecordEmbeddingsChange}
+              onMetadatasChange={onUpsertRecordMetadatasChange}
+              onDocumentsChange={onUpsertRecordDocumentsChange}
+              onSubmit={onUpsertRecords}
+            />
+          </TabsContent>
         </div>
-      </div>
+      </Tabs>
 
-      <div className="space-y-6">
-        {activeRecordTab === 'add' && (
-          <AddRecordsTab
-            addingRecords={addingRecords}
-            newRecordIds={newRecordIds}
-            newRecordEmbeddings={newRecordEmbeddings}
-            newRecordMetadatas={newRecordMetadatas}
-            newRecordDocuments={newRecordDocuments}
-            onIdsChange={onNewRecordIdsChange}
-            onEmbeddingsChange={onNewRecordEmbeddingsChange}
-            onMetadatasChange={onNewRecordMetadatasChange}
-            onDocumentsChange={onNewRecordDocumentsChange}
-            onSubmit={onAddRecords}
-          />
-        )}
-
-        {activeRecordTab === 'query' && (
-          <QueryRecordsTab
-            queryingRecords={queryingRecords}
-            queryText={queryText}
-            queryEmbedding={queryEmbedding}
-            queryNResults={queryNResults}
-            queryWhere={queryWhere}
-            onQueryTextChange={onQueryTextChange}
-            onQueryEmbeddingChange={onQueryEmbeddingChange}
-            onQueryNResultsChange={onQueryNResultsChange}
-            onQueryWhereChange={onQueryWhereChange}
-            onSubmit={onQueryRecords}
-          />
-        )}
-
-        {activeRecordTab === 'get' && (
-          <GetRecordsTab
-            fetchingRecords={fetchingRecords}
-            getRecordIds={getRecordIds}
-            getRecordLimit={getRecordLimit}
-            getRecordWhere={getRecordWhere}
-            onIdsChange={onGetRecordIdsChange}
-            onLimitChange={onGetRecordLimitChange}
-            onWhereChange={onGetRecordWhereChange}
-            onSubmit={onGetRecords}
-          />
-        )}
-
-        {activeRecordTab === 'delete' && (
-          <DeleteRecordsTab
-            deletingRecords={deletingRecords}
-            deleteRecordIds={deleteRecordIds}
-            deleteRecordWhere={deleteRecordWhere}
-            onIdsChange={onDeleteRecordIdsChange}
-            onWhereChange={onDeleteRecordWhereChange}
-            onSubmit={onDeleteRecords}
-          />
-        )}
-
-        {activeRecordTab === 'update' && (
-          <UpdateRecordsTab
-            updatingRecords={updatingRecords}
-            updateRecordIds={updateRecordIds}
-            updateRecordEmbeddings={updateRecordEmbeddings}
-            updateRecordMetadatas={updateRecordMetadatas}
-            updateRecordDocuments={updateRecordDocuments}
-            onIdsChange={onUpdateRecordIdsChange}
-            onEmbeddingsChange={onUpdateRecordEmbeddingsChange}
-            onMetadatasChange={onUpdateRecordMetadatasChange}
-            onDocumentsChange={onUpdateRecordDocumentsChange}
-            onSubmit={onUpdateRecords}
-          />
-        )}
-
-        {activeRecordTab === 'upsert' && (
-          <UpsertRecordsTab
-            upsertingRecords={upsertingRecords}
-            upsertRecordIds={upsertRecordIds}
-            upsertRecordEmbeddings={upsertRecordEmbeddings}
-            upsertRecordMetadatas={upsertRecordMetadatas}
-            upsertRecordDocuments={upsertRecordDocuments}
-            onIdsChange={onUpsertRecordIdsChange}
-            onEmbeddingsChange={onUpsertRecordEmbeddingsChange}
-            onMetadatasChange={onUpsertRecordMetadatasChange}
-            onDocumentsChange={onUpsertRecordDocumentsChange}
-            onSubmit={onUpsertRecords}
-          />
-        )}
-
-        <RecordsResult records={records} />
-      </div>
+      {records && <RecordsResult records={records} />}
     </div>
   );
 };

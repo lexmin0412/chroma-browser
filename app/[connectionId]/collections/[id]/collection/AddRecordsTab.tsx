@@ -1,5 +1,8 @@
 import React from 'react';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 interface AddRecordsTabProps {
   addingRecords: boolean;
@@ -29,76 +32,64 @@ const AddRecordsTab: React.FC<AddRecordsTabProps> = ({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="recordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Record IDs (comma separated)
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="recordIds">Record IDs (comma separated)</Label>
+          <Input
             type="text"
             id="recordIds"
             value={newRecordIds}
             onChange={(e) => onIdsChange(e.target.value)}
             placeholder="e.g., id1, id2, id3"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={addingRecords}
           />
         </div>
-        <div>
-          <label htmlFor="recordEmbeddings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Embeddings (JSON array)
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="recordEmbeddings">Embeddings (JSON array)</Label>
+          <Input
             type="text"
             id="recordEmbeddings"
             value={newRecordEmbeddings}
             onChange={(e) => onEmbeddingsChange(e.target.value)}
             placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={addingRecords}
           />
         </div>
-        <div>
-          <label htmlFor="recordMetadatas" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Metadatas (JSON array)
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="recordMetadatas">Metadatas (JSON array)</Label>
+          <Input
             type="text"
             id="recordMetadatas"
             value={newRecordMetadatas}
             onChange={(e) => onMetadatasChange(e.target.value)}
             placeholder='e.g., [{"name": "doc1"}, {"name": "doc2"}]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={addingRecords}
           />
         </div>
-        <div>
-          <label htmlFor="recordDocuments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Documents (comma separated)
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="recordDocuments">Documents (comma separated)</Label>
+          <Input
             type="text"
             id="recordDocuments"
             value={newRecordDocuments}
             onChange={(e) => onDocumentsChange(e.target.value)}
             placeholder='e.g., "Document 1", "Document 2"'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={addingRecords}
           />
         </div>
       </div>
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={onSubmit}
           disabled={addingRecords || !newRecordIds.trim()}
-          className="px-4 py-2 bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg font-medium transition-all disabled:from-indigo-400 disabled:to-blue-400 shadow-lg hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none flex items-center"
+          className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/30 transition-all"
         >
           {addingRecords ? (
             <>
-              <LoadingSpinner size="sm" />
-              <span className="ml-2">Adding...</span>
+              <Spinner className="mr-2 h-4 w-4" />
+              <span>Adding...</span>
             </>
           ) : 'Add Records'}
-        </button>
+        </Button>
       </div>
     </div>
   );

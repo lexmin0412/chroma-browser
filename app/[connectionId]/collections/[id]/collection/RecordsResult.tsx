@@ -1,5 +1,6 @@
 import React from 'react';
 import type { GetResult, QueryResult, Metadata } from 'chromadb';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface RecordsResultProps {
   records: GetResult<Metadata> | QueryResult<Metadata> | null;
@@ -11,14 +12,18 @@ const RecordsResult: React.FC<RecordsResultProps> = ({ records }) => {
   }
 
   return (
-    <div className="mt-8">
-      <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Query Results</h4>
-      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 max-h-96 overflow-y-auto shadow-inner">
-        <pre className="text-sm text-gray-700 dark:text-gray-300">
-          {JSON.stringify(records, null, 2)}
-        </pre>
-      </div>
-    </div>
+    <Card className="mt-8">
+      <CardHeader>
+        <CardTitle>Query Results</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-md bg-muted p-4 max-h-96 overflow-y-auto">
+          <pre className="text-sm">
+            {JSON.stringify(records, null, 2)}
+          </pre>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

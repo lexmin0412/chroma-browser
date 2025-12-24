@@ -717,19 +717,9 @@ export default function CollectionDetailQuery({ params: routeParams }: { params:
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="flex bg-slate-50 dark:bg-slate-900">
       {/* 主内容区 */}
-      <main className="flex-1 p-8 overflow-auto">
-        {/* 顶部导航 */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
-            Records in {collectionName}
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Manage records in selected collection
-          </p>
-        </div>
-
+      <main className="w-full">
         {/* 通知提示 */}
         <Notification type="error" message={error || ''} />
         <Notification type="success" message={success || ''} />

@@ -1,5 +1,8 @@
 import React from 'react';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 interface UpsertRecordsTabProps {
   upsertingRecords: boolean;
@@ -29,76 +32,64 @@ const UpsertRecordsTab: React.FC<UpsertRecordsTabProps> = ({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="col-span-2">
-          <label htmlFor="upsertRecordIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Record IDs (comma separated)*
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="upsertRecordIds">Record IDs (comma separated)*</Label>
+          <Input
             type="text"
             id="upsertRecordIds"
             value={upsertRecordIds}
             onChange={(e) => onIdsChange(e.target.value)}
             placeholder="e.g., id1, id2, id3"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>
-        <div className="col-span-2">
-          <label htmlFor="upsertRecordEmbeddings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Embeddings (JSON array of arrays)
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="upsertRecordEmbeddings">Embeddings (JSON array of arrays)</Label>
+          <Input
             type="text"
             id="upsertRecordEmbeddings"
             value={upsertRecordEmbeddings}
             onChange={(e) => onEmbeddingsChange(e.target.value)}
             placeholder='e.g., [[0.1, 0.2], [0.3, 0.4]]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>
-        <div className="col-span-2">
-          <label htmlFor="upsertRecordMetadatas" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Metadatas (JSON array of objects)
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="upsertRecordMetadatas">Metadatas (JSON array of objects)</Label>
+          <Input
             type="text"
             id="upsertRecordMetadatas"
             value={upsertRecordMetadatas}
             onChange={(e) => onMetadatasChange(e.target.value)}
             placeholder='e.g., [{"key1": "value1"}, {"key2": "value2"}]'
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>
-        <div className="col-span-2">
-          <label htmlFor="upsertRecordDocuments" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Documents (comma separated)
-          </label>
-          <input
+        <div className="col-span-2 space-y-2">
+          <Label htmlFor="upsertRecordDocuments">Documents (comma separated)</Label>
+          <Input
             type="text"
             id="upsertRecordDocuments"
             value={upsertRecordDocuments}
             onChange={(e) => onDocumentsChange(e.target.value)}
             placeholder="e.g., document1, document2"
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
             disabled={upsertingRecords}
           />
         </div>
       </div>
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={onSubmit}
           disabled={upsertingRecords || !upsertRecordIds.trim()}
-          className="px-4 py-2 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg font-medium transition-all disabled:from-emerald-400 disabled:to-teal-400 shadow-lg hover:shadow-xl hover:shadow-teal-500/30 disabled:shadow-none flex items-center"
+          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl hover:shadow-teal-500/30 transition-all"
         >
           {upsertingRecords ? (
             <>
-              <LoadingSpinner size="sm" />
-              <span className="ml-2">Upserting...</span>
+              <Spinner className="mr-2 h-4 w-4" />
+              <span>Upserting...</span>
             </>
           ) : 'Upsert Records'}
-        </button>
+        </Button>
       </div>
     </div>
   );
