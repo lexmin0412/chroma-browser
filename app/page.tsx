@@ -1,20 +1,34 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Icon } from '@iconify/react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2, Plus, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia, EmptyContent } from "@/components/ui/empty";
-import ConnectionsManager from "@/components/ConnectionsManager";
-import { IConnectionItem } from "@/types";
+import {
+	Empty,
+	EmptyHeader,
+	EmptyTitle,
+	EmptyDescription,
+	EmptyMedia,
+	EmptyContent,
+} from "@/components/ui/empty";
+import ConnectionList from "@/components/ConnectionList";
+import ConnectionFormDrawer from "@/components/ConnectionFormDrawer";
+import { IConnectionItem, IConnectionFlatItem } from "@/types";
 import { chromaService } from "@/app/utils/chroma-service";
+import Image from "next/image";
 
 export default function HomePage() {
 	const router = useRouter();
 	const [connections, setConnections] = useState<IConnectionItem[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [isManagerOpen, setIsManagerOpen] = useState(false);
+
+	// Drawer states
+	const [isFormOpen, setIsFormOpen] = useState(false);
+	const [editingConnection, setEditingConnection] =
+		useState<IConnectionItem | null>(null);
+	const [editingFormData, setEditingFormData] =
+		useState<Partial<IConnectionFlatItem>>();
 
 	const fetchConnections = async () => {
 		try {
@@ -35,31 +49,124 @@ export default function HomePage() {
 		fetchConnections();
 	}, []);
 
-	const handleConnectionClick = (connection: IConnectionItem) => {
+	const handleLaunch = (connection: IConnectionItem) => {
 		chromaService.setCurrentConnection(connection.id);
 		router.push(`/${connection.id}/collections`);
 	};
 
-	const handleConnectionSelect = () => {
-		fetchConnections();
-	}
+	const handleAddConnection = () => {
+		setEditingConnection(null);
+		setEditingFormData({ type: "ChromaNormal" });
+		setIsFormOpen(true);
+	};
+
+	const handleEditConnection = (connection: IConnectionItem) => {
+		setEditingConnection(connection);
+		const flatData: Partial<IConnectionFlatItem> = {
+			name: connection.name,
+			type: connection.type,
+			description: connection.description,
+			...(connection.type === "ChromaNormal"
+				? {
+						host: connection.config.host,
+						port: connection.config.port,
+				  }
+				: {
+						apiKey: connection.config.apiKey,
+						tenant: connection.config.tenant,
+						database: connection.config.database,
+				  }),
+		};
+		setEditingFormData(flatData);
+		setIsFormOpen(true);
+	};
+
+	const handleDeleteConnection = async (id: number) => {
+		if (confirm("Are you sure you want to delete this connection?")) {
+			try {
+				const response = await fetch(`/api/connections?id=${id}`, {
+					method: "DELETE",
+				});
+				if (response.ok) {
+					fetchConnections();
+				}
+			} catch (err) {
+				console.error(err);
+			}
+		}
+	};
+
+	const handleFormSubmit = async (formData: any) => {
+		try {
+			const config = {};
+			if (formData.type === "ChromaNormal") {
+				Object.assign(config, { host: formData.host, port: formData.port });
+			} else {
+				Object.assign(config, {
+					apiKey: formData.apiKey,
+					tenant: formData.tenant,
+					database: formData.database,
+				});
+			}
+
+			const connectionData = {
+				name: formData.name,
+				type: formData.type,
+				description: formData.description,
+				config,
+			};
+
+			let response;
+			if (editingConnection) {
+				response = await fetch(`/api/connections?id=${editingConnection.id}`, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(connectionData),
+				});
+			} else {
+				response = await fetch("/api/connections", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(connectionData),
+				});
+			}
+
+			if (!response.ok) throw new Error("Failed to save");
+
+			await fetchConnections();
+			setIsFormOpen(false);
+		} catch (err) {
+			console.error(err);
+			alert("Failed to save connection");
+		}
+	};
 
 	return (
-		<div className="container mx-auto px-4 py-8 mt-16">
+		<div className="container mx-auto px-4 py-8 mt-16 max-w-6xl">
 			<div className="text-center space-y-4 mb-12">
-				<div className="text-6xl mb-4">🗄️</div>
-				<h1 className="text-4xl font-bold text-slate-900 dark:text-white">Vector DB Browser</h1>
+				<div className="text-6xl mb-4 flex justify-center">
+					<Image
+						src="/vector-icon.svg"
+						alt="Vector Icon"
+						width={96}
+						height={96}
+						className="text-slate-900 dark:text-white"
+					/>
+				</div>
+				<h1 className="text-4xl font-bold text-foreground">
+					Vector DB Browser
+				</h1>
 			</div>
 
 			{isLoading ? (
 				<div className="flex justify-center items-center py-12">
-					<Icon icon="heroicons:arrow-path" className="w-8 h-8 animate-spin text-slate-400" />
+					<Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
 				</div>
 			) : connections.length === 0 ? (
 				<Empty>
 					<EmptyHeader>
 						<EmptyMedia variant="icon">
-							<Icon icon="heroicons:server-stack" className="w-12 h-12 text-slate-400" />
+							<Database className="w-12 h-12 text-muted-foreground" />
 						</EmptyMedia>
 						<EmptyTitle>No Connections Found</EmptyTitle>
 						<EmptyDescription>
@@ -67,83 +174,37 @@ export default function HomePage() {
 						</EmptyDescription>
 					</EmptyHeader>
 					<EmptyContent>
-						<Button onClick={() => setIsManagerOpen(true)}>
-							<Icon icon="heroicons:plus" className="mr-2 h-4 w-4" />
+						<Button onClick={handleAddConnection}>
+							<Plus className="mr-2 h-4 w-4" />
 							Add Connection
 						</Button>
 					</EmptyContent>
 				</Empty>
 			) : (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{connections.map((connection) => (
-						<Card
-							key={connection.id}
-							className="hover:shadow-lg transition-shadow cursor-pointer border-slate-200 dark:border-slate-800"
-							onClick={() => handleConnectionClick(connection)}
-						>
-							<CardHeader className="pb-2">
-								<div className="flex justify-between items-start">
-									<CardTitle className="text-xl">{connection.name}</CardTitle>
-									<span className={`px-2 py-1 rounded-full text-xs font-medium ${connection.type === "ChromaNormal"
-											? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-											: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-										}`}>
-										{connection.type.replace("Chroma", "")}
-									</span>
-								</div>
-								<CardDescription className="line-clamp-2 min-h-[2.5rem]">
-									{connection.description || "No description provided"}
-								</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<div className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
-									{connection.type === "ChromaNormal" && (
-										<>
-											<div className="flex items-center gap-2">
-												<Icon icon="heroicons:computer-desktop" className="w-4 h-4" />
-												<span>{connection.config?.host}:{connection.config?.port}</span>
-											</div>
-										</>
-									)}
-									{connection.type === "ChromaCloud" && (
-										<>
-											<div className="flex items-center gap-2">
-												<Icon icon="heroicons:cloud" className="w-4 h-4" />
-												<span>{connection.config?.tenant}/{connection.config?.database}</span>
-											</div>
-										</>
-									)}
-								</div>
-							</CardContent>
-							<CardFooter>
-								<Button variant="ghost" className="w-full text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300">
-									Connect <Icon icon="heroicons:arrow-right" className="ml-2 w-4 h-4" />
-								</Button>
-							</CardFooter>
-						</Card>
-					))}
-					{/* Add New Connection Card */}
-					<Card
-						className="hover:shadow-lg transition-shadow cursor-pointer border-dashed border-2 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center min-h-[200px]"
-						onClick={() => setIsManagerOpen(true)}
-					>
-						<div className="flex flex-col items-center gap-2 text-slate-500 dark:text-slate-400">
-							<div className="p-3 rounded-full bg-slate-200 dark:bg-slate-800">
-								<Icon icon="heroicons:plus" className="w-6 h-6" />
-							</div>
-							<span className="font-medium">Add New Connection</span>
-						</div>
-					</Card>
+				<div className="space-y-6">
+					<div className="flex justify-between items-center">
+						<h2 className="text-2xl font-semibold tracking-tight">
+							Your Connections
+						</h2>
+						<Button onClick={handleAddConnection}>
+							<Plus className="mr-2 h-4 w-4" />
+							Add Connection
+						</Button>
+					</div>
+					<ConnectionList
+						connections={connections}
+						onLaunch={handleLaunch}
+						onEdit={handleEditConnection}
+						onDelete={handleDeleteConnection}
+					/>
 				</div>
 			)}
 
-			<ConnectionsManager
-				isOpen={isManagerOpen}
-				onClose={() => {
-					setIsManagerOpen(false);
-					fetchConnections();
-				}}
-				onConnectionSelect={handleConnectionSelect}
+			<ConnectionFormDrawer
+				open={isFormOpen}
+				onOpenChange={setIsFormOpen}
+				initialData={editingFormData}
+				onSubmit={handleFormSubmit}
 			/>
 		</div>
 	);

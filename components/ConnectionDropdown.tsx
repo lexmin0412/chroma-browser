@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { IConnectionItem } from '@/types';
-import ConnectionsManager from './ConnectionsManager';
+import ConnectionManagementDrawer from './ConnectionManagementDrawer';
 
 interface ConnectionDropdownProps {
   connections: IConnectionItem[];
@@ -142,9 +142,9 @@ export default function ConnectionDropdown({ connections, isLoading }: Connectio
       )}
 
       {/* Connections Manager Modal */}
-      <ConnectionsManager
-        isOpen={isManagerOpen}
-        onClose={() => setIsManagerOpen(false)}
+      <ConnectionManagementDrawer
+        open={isManagerOpen}
+        onOpenChange={setIsManagerOpen}
         onConnectionSelect={handleConnectionSelect}
       />
     </div>
