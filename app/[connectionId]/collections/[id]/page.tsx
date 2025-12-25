@@ -850,14 +850,14 @@ export default function CollectionDetailPage({
 
 			{/* Add Record Sheet */}
 			<Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
-				<SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+				<SheetContent className="w-[600px] sm:w-[800px] overflow-y-auto">
 					<SheetHeader>
 						<SheetTitle>Add New Record</SheetTitle>
 						<SheetDescription>
 							Add a new record to this collection. ID is required.
 						</SheetDescription>
 					</SheetHeader>
-					<div className="grid gap-4 py-4">
+					<div className="grid gap-4 p-4">
 						<div className="grid gap-2">
 							<Label htmlFor="id">ID</Label>
 							<Input
@@ -905,7 +905,7 @@ export default function CollectionDetailPage({
 							/>
 						</div>
 					</div>
-					<div className="flex justify-end gap-2 mt-4">
+					<div className="flex justify-end gap-2 mt-4 px-4">
 						<Button
 							variant="outline"
 							onClick={() => setIsAddSheetOpen(false)}

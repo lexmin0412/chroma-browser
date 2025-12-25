@@ -137,15 +137,15 @@ export class WeaviateClientAdapter implements VectorClient {
     const collectionList: CollectionInfo[] = [];
 
     // Handle Map or Object
-    const entries = collections instanceof Map ? collections.entries() : Object.entries(collections as any);
+    // const entries = collections instanceof Map ? collections.entries() : Object.entries(collections as any);
 
-    for (const [name, config] of entries) {
-        collectionList.push({
-            name: name,
-            metadata: config as any
-        });
-    }
-    return collectionList;
+    // for (const [name, config] of entries) {
+    //     collectionList.push({
+    //         name: name,
+    //         metadata: config as any
+    //     });
+    // }
+    return collections;
   }
 
   async createCollection(name: string, metadata?: Record<string, any>): Promise<VectorCollection> {

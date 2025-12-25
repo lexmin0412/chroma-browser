@@ -31,7 +31,7 @@ export class VectorClientFactory {
         return new ChromaClientAdapter(cloudClient);
 
       case "WeaviateCloud":
-        // Weaviate Cloud 连接
+				// Weaviate Cloud 连接
         const weaviateClient = await weaviate.connectToWeaviateCloud(
           connection.config.weaviateURL as string,
           {
