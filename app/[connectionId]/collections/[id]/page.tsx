@@ -82,7 +82,6 @@ export default function CollectionDetailPage({
 		const init = async () => {
 			const routeParamsObj = await routeParams;
 			setCollectionName(routeParamsObj.id);
-			fetchRecordCount(routeParamsObj.id);
 		};
 		init();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
