@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
+import { Toaster } from 'sonner';
 import "./globals.css";
 import ConnectionDropdownWrapper from '../app/ConnectionDropdownWrapper';
 
@@ -67,6 +68,7 @@ export default function RootLayout({
             {children}
           </main>
         </div>
+        <Toaster position="top-center" />
       </body>
     </html>
   );
