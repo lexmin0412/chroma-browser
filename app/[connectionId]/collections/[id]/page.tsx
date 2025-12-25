@@ -1,13 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { chromaService } from "@/app/utils/chroma-service";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
-import ConfirmationDialog from "@/app/components/ConfirmationDialog";
-import SettingsModal from "@/app/components/SettingsModal";
-import ConfigManager from "@/app/utils/config-manager";
 import type { GetResult, QueryResult, Metadata } from "chromadb";
-import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import {
 	Table,
@@ -18,13 +14,13 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { Icon } from "@iconify/react";
 import CollectionDetailQuery from "./query";
@@ -41,14 +37,16 @@ export default function CollectionDetailPage({
 	>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<string | null>(null);
-	const [collectionName, setCollectionName] = useState("");
-	const [activeTab, setActiveTab] = useState("view");
-	const [recordCount, setRecordCount] = useState(0);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [collectionName, setCollectionName] = useState("");
+  const [activeTab, setActiveTab] = useState("view");
+  const [recordCount, setRecordCount] = useState(0);
   const [recordsLoading, setRecordsLoading] = useState(false);
   const [selectedRecordIndex, setSelectedRecordIndex] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [collectionMetadata, setCollectionMetadata] = useState<Record<string, unknown> | null>(null);
   const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { connectionId } = useParams<{ connectionId: string }>();
   const router = useRouter();
   const { refreshCollections } = useCollectionsContext();
@@ -58,49 +56,6 @@ export default function CollectionDetailPage({
 	const [getRecordIds, setGetRecordIds] = useState("");
 	const [getRecordWhere, setGetRecordWhere] = useState("");
 	const [getRecordLimit, setGetRecordLimit] = useState("10");
-
-	// 删除记录状态
-	const [deletingRecords, setDeletingRecords] = useState(false);
-	const [deleteRecordIds, setDeleteRecordIds] = useState("");
-	const [deleteRecordWhere, setDeleteRecordWhere] = useState("");
-
-	// 更新记录状态
-	const [updatingRecords, setUpdatingRecords] = useState(false);
-	const [updateRecordIds, setUpdateRecordIds] = useState("");
-	const [updateRecordEmbeddings, setUpdateRecordEmbeddings] = useState("");
-	const [updateRecordMetadatas, setUpdateRecordMetadatas] = useState("");
-	const [updateRecordDocuments, setUpdateRecordDocuments] = useState("");
-
-	// 插入更新记录状态
-	const [upsertingRecords, setUpsertingRecords] = useState(false);
-	const [upsertRecordIds, setUpsertRecordIds] = useState("");
-	const [upsertRecordEmbeddings, setUpsertRecordEmbeddings] = useState("");
-	const [upsertRecordMetadatas, setUpsertRecordMetadatas] = useState("");
-	const [upsertRecordDocuments, setUpsertRecordDocuments] = useState("");
-
-	// 确认对话框状态
-	const [showDeleteRecordsConfirm, setShowDeleteRecordsConfirm] =
-		useState(false);
-	const [showUpdateRecordsConfirm, setShowUpdateRecordsConfirm] =
-		useState(false);
-	const [showUpsertRecordsConfirm, setShowUpsertRecordsConfirm] =
-		useState(false);
-	const [deleteParams, setDeleteParams] = useState<{
-		ids?: string[];
-		where?: Metadata;
-	} | null>(null);
-	const [updateParams, setUpdateParams] = useState<{
-		ids: string[];
-		embeddings?: number[][];
-		metadatas?: Metadata[];
-		documents?: string[];
-	} | null>(null);
-	const [upsertParams, setUpsertParams] = useState<{
-		ids: string[];
-		embeddings?: number[][];
-		metadatas?: Metadata[];
-		documents?: string[];
-	} | null>(null);
 
 	// 初始化集合名称
 	useEffect(() => {
@@ -115,52 +70,54 @@ export default function CollectionDetailPage({
 	// 清空通知
 
 	// 获取集合记录数量
-	const fetchRecordCount = async (name: string = collectionName) => {
-		try {
-			setRecordsLoading(true);
-			const count = await chromaService.countRecords(name);
-			setRecordCount(count);
-		} catch (err) {
-			console.error("Failed to fetch record count:", err);
-		} finally {
-			setRecordsLoading(false);
-		}
-	};
+  const fetchRecordCount = async (name: string = collectionName) => {
+    try {
+      setRecordsLoading(true);
+      const count = await chromaService.countRecords(name);
+      setRecordCount(count);
+    } catch (err) {
+      console.error("Failed to fetch record count:", err);
+    } finally {
+      setRecordsLoading(false);
+    }
+  };
 
-	// 获取所有记录
-	const getRecords = async () => {
-		try {
-			setFetchingRecords(true);
-			setError(null);
-			setLoading(true);
+  // 获取所有记录
+  const getRecords = async () => {
+    try {
+      setFetchingRecords(true);
+      setError(null);
+      setLoading(true);
 
-			// 准备参数
-			const params: {
-				ids?: string[];
-				where?: import("chromadb").Where;
-				limit?: number;
-				include?: ("embeddings" | "metadatas" | "documents")[];
-			} = {};
+      // 准备参数
+      const params: {
+        ids?: string[];
+        where?: import("chromadb").Where;
+        limit?: number;
+        offset?: number;
+        include?: ("embeddings" | "metadatas" | "documents")[];
+      } = {};
 
-			// 解析 IDs
-			if (getRecordIds.trim()) {
-				params.ids = getRecordIds
-					.split(",")
-					.map((id) => id.trim())
-					.filter(Boolean);
+      // 解析 IDs
+      if (getRecordIds.trim()) {
+        params.ids = getRecordIds
+          .split(",")
+          .map((id) => id.trim())
+          .filter(Boolean);
 
-				// 验证 IDs 格式
-				for (const id of params.ids) {
-					if (!/^[a-zA-Z0-9\-_]+$/.test(id)) {
-						throw new Error(
-							`ID "${id}" 包含无效字符，只能包含字母、数字、连字符(-)和下划线(_)`
-						);
-					}
-				}
-			} else {
-				// 如果没有指定 IDs，则设置默认限制
-				params.limit = parseInt(getRecordLimit) || 10;
-			}
+        // 验证 IDs 格式
+        for (const id of params.ids) {
+          if (!/^[a-zA-Z0-9\-_]+$/.test(id)) {
+            throw new Error(
+              `ID "${id}" 包含无效字符，只能包含字母、数字、连字符(-)和下划线(_)`
+            );
+          }
+        }
+      } else {
+        // 如果没有指定 IDs，则设置默认限制
+        params.limit = parseInt(getRecordLimit) || 10;
+        params.offset = (currentPage - 1) * (params.limit || 10);
+      }
 
 			// 解析 where 条件
 			if (getRecordWhere.trim()) {
@@ -183,34 +140,35 @@ export default function CollectionDetailPage({
 				}
 			}
 
-			params.include = ["embeddings", "metadatas", "documents"];
+      params.include = ["embeddings", "metadatas", "documents"];
 
-			// 执行查询
-			const results = await chromaService.getRecords(collectionName, params);
-			setRecords(results);
+      // 执行查询
+      const results = await chromaService.getRecords(collectionName, params);
+      setRecords(results);
 
-			setSuccess("记录获取成功");
-		} catch (err) {
-			const errorMessage = (err as Error).message;
-			// 检查是否是连接错误
-			if (
-				errorMessage.includes("fetch") ||
-				errorMessage.includes("network") ||
-				errorMessage.includes("ECONNREFUSED")
-			) {
-				setError("无法连接到 Chroma DB 服务器，请确保服务器正在运行并可访问。");
-			} else {
-				setError("记录获取失败: " + errorMessage);
-			}
-		} finally {
-			setFetchingRecords(false);
-			setLoading(false);
-		}
-	};
+      setSuccess("记录获取成功");
+    } catch (err) {
+      const errorMessage = (err as Error).message;
+      // 检查是否是连接错误
+      if (
+        errorMessage.includes("fetch") ||
+        errorMessage.includes("network") ||
+        errorMessage.includes("ECONNREFUSED")
+      ) {
+        setError("无法连接到 Chroma DB 服务器，请确保服务器正在运行并可访问。");
+      } else {
+        setError("记录获取失败: " + errorMessage);
+      }
+    } finally {
+      setFetchingRecords(false);
+      setLoading(false);
+    }
+  };
 
-	// 当集合名称变化时获取记录
+  // 当集合名称变化时获取记录
   useEffect(() => {
     if (collectionName) {
+      setCurrentPage(1);
       getRecords();
       // load collection metadata
       chromaService.listCollections().then((cols) => {
@@ -222,7 +180,28 @@ export default function CollectionDetailPage({
 
 	return (
 		<div className="w-full h-full flex flex-col p-4 space-y-4">
-			<h1 className="text-2xl font-bold shrink-0">Collection {collectionName}</h1>
+			<div className="flex items-center gap-2 group shrink-0">
+        <Icon icon="heroicons:rectangle-stack" className="w-5 h-5 text-slate-500" />
+        <h3 className="text-base font-semibold">{collectionName}</h3>
+        <button
+          type="button"
+          aria-label="Copy collection name"
+          title="复制集合名称"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(collectionName);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 1200);
+            } catch {}
+          }}
+          className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <Icon
+            icon={copied ? "heroicons:check" : "heroicons:clipboard-document"}
+            className={`w-4 h-4 ${copied ? "text-green-600" : "text-slate-400 group-hover:text-slate-600"}`}
+          />
+        </button>
+      </div>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col overflow-hidden min-h-0">
         <TabsList className="shrink-0">
@@ -303,6 +282,38 @@ export default function CollectionDetailPage({
 									)}
 								</TableBody>
 							</Table>
+              <div className="flex items-center justify-between mt-2">
+                <div className="text-sm text-muted-foreground">
+                  Page {currentPage} of {Math.max(1, Math.ceil((recordCount || 0) / (parseInt(getRecordLimit) || 10)))}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage <= 1 || loading}
+                    onClick={() => {
+                      const next = Math.max(1, currentPage - 1);
+                      setCurrentPage(next);
+                      getRecords();
+                    }}
+                  >
+                    Prev
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage >= Math.max(1, Math.ceil((recordCount || 0) / (parseInt(getRecordLimit) || 10))) || loading}
+                    onClick={() => {
+                      const total = Math.max(1, Math.ceil((recordCount || 0) / (parseInt(getRecordLimit) || 10)));
+                      const next = Math.min(total, currentPage + 1);
+                      setCurrentPage(next);
+                      getRecords();
+                    }}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
 						</div>
 					)}
 				</TabsContent>

@@ -71,6 +71,7 @@ export default function CollectionsLayout({
 	const [collectionToDelete, setCollectionToDelete] = useState<string | null>(
 		null
 	);
+	const [deletingCollection, setDeletingCollection] = useState(false);
 
 	// 获取集合列表
 	const fetchCollections = async () => {
@@ -150,15 +151,14 @@ export default function CollectionsLayout({
 		if (!collectionToDelete) return;
 
 		try {
+			setDeletingCollection(true);
 			setLoading(true);
 			setError(null);
 
 			await chromaService.deleteCollection(collectionToDelete);
+			setShowDeleteCollectionConfirm(false);
+			setCollectionToDelete(null);
 
-			// 更新集合列表
-			await fetchCollections();
-
-			console.log("集合删除成功");
 		} catch (err) {
 			const errorMessage = (err as Error).message;
 			// 检查是否是连接错误
@@ -173,9 +173,11 @@ export default function CollectionsLayout({
 			}
 		} finally {
 			setLoading(false);
-			setShowDeleteCollectionConfirm(false);
-			setCollectionToDelete(null);
+			setDeletingCollection(false);
 		}
+
+		// 更新集合列表
+		await fetchCollections();
 	};
 
 	// 初始化时获取集合列表
@@ -406,6 +408,7 @@ export default function CollectionsLayout({
 									<DialogFooter>
 										<Button
 											variant="outline"
+											disabled={deletingCollection}
 											onClick={() => {
 												setShowDeleteCollectionConfirm(false);
 												setCollectionToDelete(null);
@@ -415,9 +418,18 @@ export default function CollectionsLayout({
 										</Button>
 										<Button
 											variant="destructive"
+											disabled={deletingCollection}
 											onClick={handleDeleteCollectionConfirm}
+											className="cursor-pointer"
 										>
-											Delete
+											{deletingCollection ? (
+												<>
+													<Spinner className="h-4 w-4 mr-2" />
+													Deleting...
+												</>
+											) : (
+												"Delete"
+											)}
 										</Button>
 									</DialogFooter>
 								</DialogContent>

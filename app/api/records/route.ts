@@ -97,12 +97,18 @@ export async function GET(request: Request) {
       // 从查询参数中提取参数
       const idsParam = searchParams.get('ids');
       const limitParam = searchParams.get('limit');
+      const offsetParam = searchParams.get('offset');
+      const includeParam = searchParams.get('include');
+      const whereDocumentParam = searchParams.get('whereDocument');
       const whereParam = searchParams.get('where');
 
       interface GetParams {
         ids?: string[];
         limit?: number;
+        offset?: number;
         where?: Where;
+        whereDocument?: import('chromadb').WhereDocument;
+        include?: ('distances' | 'documents' | 'embeddings' | 'metadatas' | 'uris')[];
       }
 
       const params: GetParams = {};
@@ -115,12 +121,30 @@ export async function GET(request: Request) {
         params.limit = parseInt(limitParam);
       }
 
+      if (offsetParam) {
+        params.offset = parseInt(offsetParam);
+      }
+
       if (whereParam) {
         try {
           params.where = JSON.parse(whereParam);
         } catch {
           // 如果解析失败，忽略where参数
         }
+      }
+
+      if (whereDocumentParam) {
+        try {
+          params.whereDocument = JSON.parse(whereDocumentParam);
+        } catch {
+          // 解析失败时忽略
+        }
+      }
+
+      if (includeParam) {
+        const allowed = new Set(['distances', 'documents', 'embeddings', 'metadatas', 'uris']);
+        const parts = includeParam.split(',').map(s => s.trim()).filter(Boolean);
+        params.include = parts.filter(p => allowed.has(p)) as ('distances' | 'documents' | 'embeddings' | 'metadatas' | 'uris')[];
       }
 
       const result = await collection.get(params);
@@ -240,7 +264,7 @@ export async function PATCH(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.update(params);
