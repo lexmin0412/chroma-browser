@@ -1,5 +1,5 @@
 import { ChromaClient, CloudClient } from "chromadb";
-import weaviate, { ApiKey } from 'weaviate-client';
+import weaviate, { ApiKey, WeaviateClient } from 'weaviate-client';
 import { IConnectionItem } from "@/types";
 
 // 连接类型定义
@@ -39,6 +39,9 @@ export const getClient = async (connection: IConnectionItem) => {
 };
 
 // 获取集合实例
-export const getCollection = async (client: ChromaClient | CloudClient, name: string) => {
-	return await client.getCollection({ name });
+export const getCollection = async (type: ConnectionType, client: ChromaClient | CloudClient | WeaviateClient, name: string) => {
+	if (type === "WeaviateCloud") {
+		return await (client as WeaviateClient).collections.get(name)
+	}
+	return await (client as ChromaClient | CloudClient).getCollection({ name });
 };

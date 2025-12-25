@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import { getClient } from '@/app/utils/chroma';
-import { prisma } from '@/app/utils/prisma';
 
+import { NextResponse } from 'next/server';
+import { prisma } from '@/app/utils/prisma';
+import type { IConnectionItem } from '@/types';
+import { VectorClientFactory } from '@/lib/vector-sdk/factory';
 
 // 检查服务器状态
 export async function GET(request: Request) {
@@ -29,12 +30,12 @@ export async function GET(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = await VectorClientFactory.getClient(connection as unknown as IConnectionItem);
 
     // 并行执行心跳和版本检查
     const [heartbeat, version] = await Promise.all([
-      client.heartbeat(),
-      client.version()
+      client.heartbeat ? client.heartbeat() : Promise.resolve(0),
+      client.version ? client.version() : Promise.resolve('unknown')
     ]);
 
     return NextResponse.json({
@@ -77,10 +78,18 @@ export async function DELETE(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
-    await client.reset();
+    const client = await VectorClientFactory.getClient(connection as unknown as IConnectionItem);
+    
+    if (client.reset) {
+        await client.reset();
+        return NextResponse.json({ success: true });
+    } else {
+        return NextResponse.json({
+            success: false,
+            error: "Reset operation is not supported for this connection type"
+        }, { status: 501 });
+    }
 
-    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error resetting database:', error);
     return NextResponse.json({

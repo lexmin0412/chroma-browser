@@ -1,9 +1,8 @@
-import { NextResponse } from 'next/server';
-import { getClient, getCollection } from '@/app/utils/chroma';
-import { prisma } from '@/app/utils/prisma';
-import type { Where } from 'chromadb';
-import type { IConnectionItem } from '@/types';
 
+import { NextResponse } from 'next/server';
+import { prisma } from '@/app/utils/prisma';
+import type { IConnectionItem } from '@/types';
+import { VectorClientFactory } from '@/lib/vector-sdk/factory';
 
 // 获取记录数量
 export async function OPTIONS() {
@@ -35,9 +34,8 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection as unknown as IConnectionItem);
-    const collection = await getCollection(client, collectionName);
-
+    const client = await VectorClientFactory.getClient(connection as unknown as IConnectionItem);
+    const collection = await client.getCollection(collectionName);
     const result = await collection.add(params);
 
     return NextResponse.json({ success: true, result });
@@ -85,8 +83,8 @@ export async function GET(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection as unknown as IConnectionItem);
-    const collection = await getCollection(client, collectionName);
+    const client = await VectorClientFactory.getClient(connection as unknown as IConnectionItem);
+    const collection = await client.getCollection(collectionName);
 
     if (action === 'count') {
       // 获取记录数量
@@ -102,16 +100,7 @@ export async function GET(request: Request) {
       const whereDocumentParam = searchParams.get('whereDocument');
       const whereParam = searchParams.get('where');
 
-      interface GetParams {
-        ids?: string[];
-        limit?: number;
-        offset?: number;
-        where?: Where;
-        whereDocument?: import('chromadb').WhereDocument;
-        include?: ('distances' | 'documents' | 'embeddings' | 'metadatas' | 'uris')[];
-      }
-
-      const params: GetParams = {};
+      const params: any = {};
 
       if (idsParam) {
         params.ids = idsParam.split(',');
@@ -144,7 +133,7 @@ export async function GET(request: Request) {
       if (includeParam) {
         const allowed = new Set(['distances', 'documents', 'embeddings', 'metadatas', 'uris']);
         const parts = includeParam.split(',').map(s => s.trim()).filter(Boolean);
-        params.include = parts.filter(p => allowed.has(p)) as ('distances' | 'documents' | 'embeddings' | 'metadatas' | 'uris')[];
+        params.include = parts.filter(p => allowed.has(p));
       }
 
       const result = await collection.get(params);
@@ -184,8 +173,8 @@ export async function PUT(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection as unknown as IConnectionItem);
-    const collection = await getCollection(client, collectionName);
+    const client = await VectorClientFactory.getClient(connection as unknown as IConnectionItem);
+    const collection = await client.getCollection(collectionName);
 
     const result = await collection.query(params);
 
@@ -224,8 +213,8 @@ export async function DELETE(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection as unknown as IConnectionItem);
-    const collection = await getCollection(client, collectionName);
+    const client = await VectorClientFactory.getClient(connection as unknown as IConnectionItem);
+    const collection = await client.getCollection(collectionName);
 
     const result = await collection.delete(params);
 
@@ -264,8 +253,8 @@ export async function PATCH(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection as unknown as IConnectionItem);
-    const collection = await getCollection(client, collectionName);
+    const client = await VectorClientFactory.getClient(connection as unknown as IConnectionItem);
+    const collection = await client.getCollection(collectionName);
 
     const result = await collection.update(params);
 
