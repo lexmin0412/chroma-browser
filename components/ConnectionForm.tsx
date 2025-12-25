@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,17 +18,9 @@ interface ConnectionFormProps {
 }
 
 export default function ConnectionForm({ initialData, onSubmit, onCancel, isSubmitting = false }: ConnectionFormProps) {
-  const [formData, setFormData] = useState<Partial<IFormData>>({
-    type: "ChromaNormal",
+  const [formData, setFormData] = useState<Partial<IFormData>>(() => {
+    return initialData ? { type: "ChromaNormal", ...initialData } : { type: "ChromaNormal" };
   });
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData({ type: "ChromaNormal", ...initialData });
-    } else {
-        setFormData({ type: "ChromaNormal" });
-    }
-  }, [initialData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<

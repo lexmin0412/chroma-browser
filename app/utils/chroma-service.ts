@@ -1,4 +1,4 @@
-import type { CollectionMetadata, Metadata, Where, WhereDocument } from 'chromadb';
+import type { Metadata, Where, WhereDocument } from 'chromadb';
 
 // 客户端服务用于与服务端 API 通信
 class ChromaService {
@@ -48,7 +48,7 @@ class ChromaService {
   // 集合相关操作
 
   // 创建集合
-  async createCollection(name: string, metadata?: CollectionMetadata) {
+  async createCollection(name: string, metadata?: Record<string, unknown>) {
     const connectionId = this.getCurrentConnection();
     const response = await fetch(`${this.baseUrl}/collections?connectionId=${connectionId}`, {
       method: 'POST',
@@ -101,6 +101,23 @@ class ChromaService {
     }
 
     return result;
+  }
+
+  // 修改集合（名称或元数据）
+  async updateCollection(name: string, payload: { newName?: string; metadata?: Record<string, unknown> }) {
+    const connectionId = this.getCurrentConnection();
+    const response = await fetch(`${this.baseUrl}/collections?connectionId=${connectionId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ oldName: name, ...payload, connectionId }),
+    });
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+    return result.collection;
   }
 
   // 记录相关操作

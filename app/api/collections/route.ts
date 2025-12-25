@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getClient } from '@/app/utils/chroma';
 import { prisma } from '@/app/utils/prisma';
+import type { CollectionMetadata } from 'chromadb';
+import type { IConnectionItem } from '@/types';
 
 
 // 创建集合
@@ -28,7 +30,7 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
 
     const collection = await client.createCollection({
       name,
@@ -77,7 +79,7 @@ export async function GET(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
     const collections = await client.listCollections();
 
     // 转换集合数据格式
@@ -124,7 +126,7 @@ export async function DELETE(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
     await client.deleteCollection({ name });
 
     return NextResponse.json({ success: true });
@@ -133,6 +135,64 @@ export async function DELETE(request: Request) {
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to delete collection'
+    }, { status: 500 });
+  }
+}
+
+// 修改集合：名称或元数据
+export async function PATCH(request: Request) {
+  try {
+    const { oldName, name, metadata, newName, connectionId } = await request.json();
+
+    if (!connectionId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection ID is required'
+      }, { status: 400 });
+    }
+
+    const connection = await prisma.connection.findUnique({
+      where: { id: connectionId }
+    });
+
+    if (!connection) {
+      return NextResponse.json({
+        success: false,
+        error: 'Connection not found'
+      }, { status: 404 });
+    }
+
+    const client = getClient(connection as unknown as IConnectionItem);
+    const currentName = (oldName ?? name) as string;
+    const collection = await client.getCollection({ name: currentName });
+
+    let finalMetadata: CollectionMetadata | undefined = undefined;
+    if (metadata && typeof metadata === "object") {
+      const existing = (collection.metadata ?? {}) as CollectionMetadata;
+      const merged: CollectionMetadata = { ...existing, ...(metadata as CollectionMetadata) };
+      if ("hnsw:space" in metadata) {
+        merged["hnsw:space"] = existing["hnsw:space"];
+      }
+      finalMetadata = merged;
+    }
+
+    await collection.modify({
+      ...(newName ? { name: newName } : {}),
+      ...(finalMetadata ? { metadata: finalMetadata } : {}),
+    });
+
+    return NextResponse.json({
+      success: true,
+      collection: {
+        name: newName || currentName,
+        metadata: finalMetadata ?? (collection.metadata as Record<string, unknown> | undefined),
+      }
+    });
+  } catch (error) {
+    console.error('Error modifying collection:', error);
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to modify collection'
     }, { status: 500 });
   }
 }

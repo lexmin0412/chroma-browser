@@ -8,7 +8,7 @@ import SettingsModal from "@/app/components/SettingsModal";
 import ConfigManager from "@/app/utils/config-manager";
 import type { GetResult, QueryResult, Metadata } from "chromadb";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import {
 	Table,
 	TableBody,
@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/sheet";
 import { Icon } from "@iconify/react";
 import CollectionDetailQuery from "./query";
+import { useCollectionsContext } from "../layout";
+import CollectionForm from "@/components/CollectionForm";
 
 export default function CollectionDetailPage({
 	params: routeParams,
@@ -43,8 +45,13 @@ export default function CollectionDetailPage({
 	const [collectionName, setCollectionName] = useState("");
 	const [activeTab, setActiveTab] = useState("view");
 	const [recordCount, setRecordCount] = useState(0);
-	const [recordsLoading, setRecordsLoading] = useState(false);
-	const [selectedRecordIndex, setSelectedRecordIndex] = useState<number | null>(null);
+  const [recordsLoading, setRecordsLoading] = useState(false);
+  const [selectedRecordIndex, setSelectedRecordIndex] = useState<number | null>(null);
+  const [collectionMetadata, setCollectionMetadata] = useState<Record<string, unknown> | null>(null);
+  const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
+  const { connectionId } = useParams<{ connectionId: string }>();
+  const router = useRouter();
+  const { refreshCollections } = useCollectionsContext();
 
 	// 获取记录状态
 	const [fetchingRecords, setFetchingRecords] = useState(false);
@@ -202,21 +209,27 @@ export default function CollectionDetailPage({
 	};
 
 	// 当集合名称变化时获取记录
-	useEffect(() => {
-		if (collectionName) {
-			getRecords();
-		}
-	}, [collectionName]);
+  useEffect(() => {
+    if (collectionName) {
+      getRecords();
+      // load collection metadata
+      chromaService.listCollections().then((cols) => {
+        const found = (cols as Array<{ name: string; metadata?: Record<string, unknown> }>).find(c => c.name === collectionName);
+        setCollectionMetadata(found?.metadata ?? null);
+      }).catch(() => {});
+    }
+  }, [collectionName]);
 
 	return (
 		<div className="w-full h-full flex flex-col p-4 space-y-4">
 			<h1 className="text-2xl font-bold shrink-0">Collection {collectionName}</h1>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col overflow-hidden min-h-0">
-				<TabsList className="shrink-0">
-					<TabsTrigger value="view">View</TabsTrigger>
-					<TabsTrigger value="query">Query</TabsTrigger>
-				</TabsList>
+        <TabsList className="shrink-0">
+          <TabsTrigger value="view">View</TabsTrigger>
+          <TabsTrigger value="query">Query</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
 				<TabsContent value="view" className="flex-1 overflow-hidden data-[state=active]:flex mt-2">
 					{loading ? (
 						<LoadingSpinner />
@@ -293,11 +306,55 @@ export default function CollectionDetailPage({
 						</div>
 					)}
 				</TabsContent>
-				<TabsContent value="query" className="flex-1 overflow-auto data-[state=active]:block mt-2">
-					{/* 搜索 */}
-					<CollectionDetailQuery params={routeParams} />
-				</TabsContent>
-			</Tabs>
+        <TabsContent value="query" className="flex-1 overflow-auto data-[state=active]:block mt-2">
+          {/* 搜索 */}
+          <CollectionDetailQuery params={routeParams} />
+        </TabsContent>
+        <TabsContent value="settings" className="flex-1 overflow-auto data-[state=active]:block mt-2 p-2">
+          <div className="max-w-2xl">
+            <CollectionForm
+              initialName={collectionName}
+              initialMetadata={collectionMetadata ?? undefined}
+              allowEditName
+              submitting={isUpdatingSettings}
+              onSubmit={async ({ name, metadata }) => {
+                try {
+                  setIsUpdatingSettings(true);
+                  const payload: { newName?: string; metadata?: Record<string, unknown> } = {};
+                  if (name && name !== collectionName) {
+                    payload.newName = name;
+                  }
+                  if (metadata) {
+                    payload.metadata = metadata;
+                  }
+                  await chromaService.updateCollection(collectionName, payload);
+                  if (payload.newName) {
+                    setCollectionName(payload.newName);
+                    if (connectionId) {
+                      const url = `/${connectionId}/collections/${payload.newName}`;
+                      // 路由到新的集合详情
+                      router.replace(url);
+                    }
+                  }
+                  setCollectionMetadata((payload.metadata as Record<string, unknown> | null) ?? collectionMetadata);
+                  // 刷新左侧集合列表
+                  await refreshCollections();
+                  setSuccess("集合设置已更新");
+                } catch (err) {
+                  const errorMessage = (err as Error).message;
+                  if (errorMessage.includes("hnsw:space")) {
+                    setError("不支持修改距离度量（hnsw:space）。如需更改，请克隆新集合。");
+                  } else {
+                    setError("更新集合失败: " + errorMessage);
+                  }
+                } finally {
+                  setIsUpdatingSettings(false);
+                }
+              }}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
 
 			{/* Record Detail Sheet */}
 			<Sheet

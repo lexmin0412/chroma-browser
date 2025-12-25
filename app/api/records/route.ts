@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getClient, getCollection } from '@/app/utils/chroma';
 import { prisma } from '@/app/utils/prisma';
+import type { Where } from 'chromadb';
+import type { IConnectionItem } from '@/types';
 
 
 // 获取记录数量
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.add(params);
@@ -83,7 +85,7 @@ export async function GET(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
     const collection = await getCollection(client, collectionName);
 
     if (action === 'count') {
@@ -97,14 +99,10 @@ export async function GET(request: Request) {
       const limitParam = searchParams.get('limit');
       const whereParam = searchParams.get('where');
 
-      interface WhereValue {
-        [key: string]: string | number | boolean | WhereValue;
-      }
-
       interface GetParams {
         ids?: string[];
         limit?: number;
-        where?: WhereValue;
+        where?: Where;
       }
 
       const params: GetParams = {};
@@ -125,7 +123,7 @@ export async function GET(request: Request) {
         }
       }
 
-      const result = await collection.get(params as any);
+      const result = await collection.get(params);
       return NextResponse.json({ success: true, result });
     }
   } catch (error) {
@@ -162,7 +160,7 @@ export async function PUT(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.query(params);
@@ -202,7 +200,7 @@ export async function DELETE(request: Request) {
       }, { status: 404 });
     }
 
-    const client = getClient(connection);
+    const client = getClient(connection as unknown as IConnectionItem);
     const collection = await getCollection(client, collectionName);
 
     const result = await collection.delete(params);

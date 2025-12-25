@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/empty";
 import ConnectionList from "@/components/ConnectionList";
 import ConnectionFormDrawer from "@/components/ConnectionFormDrawer";
-import { IConnectionItem, IConnectionFlatItem } from "@/types";
+import { IConnectionItem, IConnectionFlatItem, IChromaNormalConnectionFlatItem, IChromaCloudConnectionFlatItem } from "@/types";
 import { chromaService } from "@/app/utils/chroma-service";
 import Image from "next/image";
 
@@ -96,16 +96,18 @@ export default function HomePage() {
 		}
 	};
 
-	const handleFormSubmit = async (formData: any) => {
+	const handleFormSubmit = async (formData: Omit<IConnectionFlatItem, "id">) => {
 		try {
 			const config = {};
 			if (formData.type === "ChromaNormal") {
-				Object.assign(config, { host: formData.host, port: formData.port });
+				const normal = formData as unknown as Omit<IChromaNormalConnectionFlatItem, "id">;
+				Object.assign(config, { host: normal.host, port: normal.port });
 			} else {
+				const cloud = formData as unknown as Omit<IChromaCloudConnectionFlatItem, "id">;
 				Object.assign(config, {
-					apiKey: formData.apiKey,
-					tenant: formData.tenant,
-					database: formData.database,
+					apiKey: cloud.apiKey,
+					tenant: cloud.tenant,
+					database: cloud.database,
 				});
 			}
 

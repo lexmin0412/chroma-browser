@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { Loader2, Plus, AlertCircle } from 'lucide-react';
 import { chromaService } from "@/app/utils/chroma-service";
-import { IConnectionFlatItem, IConnectionItem } from "@/types";
+import { IConnectionFlatItem, IConnectionItem, IChromaNormalConnectionFlatItem, IChromaCloudConnectionFlatItem } from "@/types";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -89,13 +89,15 @@ export default function ConnectionManagementDrawer({ open, onOpenChange, onConne
     }
   };
 
-  const handleFormSubmit = async (formData: any) => {
+  const handleFormSubmit = async (formData: Omit<IConnectionFlatItem, "id">) => {
       try {
           const config = {};
           if (formData.type === "ChromaNormal") {
-            Object.assign(config, { host: formData.host, port: formData.port });
+            const normal = formData as unknown as Omit<IChromaNormalConnectionFlatItem, "id">;
+            Object.assign(config, { host: normal.host, port: normal.port });
           } else {
-            Object.assign(config, { apiKey: formData.apiKey, tenant: formData.tenant, database: formData.database });
+            const cloud = formData as unknown as Omit<IChromaCloudConnectionFlatItem, "id">;
+            Object.assign(config, { apiKey: cloud.apiKey, tenant: cloud.tenant, database: cloud.database });
           }
 
           const connectionData = {

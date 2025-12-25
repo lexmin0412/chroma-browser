@@ -16,6 +16,7 @@
   "dependencies": {
     "@chroma-core/default-embed": "^0.1.9",
     "@iconify/react": "^6.0.2",
+    "@monaco-editor/react": "^4.7.0",
     "@prisma/adapter-mariadb": "^7.1.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
