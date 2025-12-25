@@ -21,10 +21,22 @@ export interface IChromaCloudConnectionItem extends Connection {
 
 export type IChromaCloudConnectionFlatItem = Omit<IChromaCloudConnectionItem, 'config'> & IChromaCloudConnectionItem['config']
 
+export interface IWeaviateCloudConnectionItem extends Connection {
+	type: 'WeaviateCloud';
+	config: {
+		weaviateURL: string;
+		weaviateApiKey: string;
+	}
+}
+
+export type IWeaviateCloudConnectionFlatItem = Omit<IWeaviateCloudConnectionItem, 'config'> & IWeaviateCloudConnectionItem['config']
+
 export type IConnectionItem =
 	| IChromaCloudConnectionItem
 	| IChromaNormalConnectionItem
+	| IWeaviateCloudConnectionItem
 
 export type IConnectionFlatItem =
 	| IChromaCloudConnectionFlatItem
 	| IChromaNormalConnectionFlatItem
+	| IWeaviateCloudConnectionFlatItem

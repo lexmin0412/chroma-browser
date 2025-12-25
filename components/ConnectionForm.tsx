@@ -6,7 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IConnectionFlatItem, IChromaNormalConnectionFlatItem, IChromaCloudConnectionFlatItem } from "@/types";
+import {
+  IConnectionFlatItem,
+  IChromaNormalConnectionFlatItem,
+  IChromaCloudConnectionFlatItem,
+  IWeaviateCloudConnectionFlatItem
+} from "@/types";
 
 type IFormData = Omit<IConnectionFlatItem, "id">;
 
@@ -57,12 +62,13 @@ export default function ConnectionForm({ initialData, onSubmit, onCancel, isSubm
             <Label>Connection Type</Label>
             <Tabs
               value={formData?.type || "ChromaNormal"}
-              onValueChange={(val) => setFormData((prev) => ({ ...prev, type: val as "ChromaNormal" | "ChromaCloud" }))}
+              onValueChange={(val) => setFormData((prev) => ({ ...prev, type: val as "ChromaNormal" | "ChromaCloud" | "WeaviateCloud" }))}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="ChromaNormal">Normal (Local/Server)</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="ChromaNormal">Chroma Normal</TabsTrigger>
                 <TabsTrigger value="ChromaCloud">Chroma Cloud</TabsTrigger>
+                <TabsTrigger value="WeaviateCloud">Weaviate Cloud</TabsTrigger>
               </TabsList>
 
               <div className="mt-4">
@@ -129,6 +135,31 @@ export default function ConnectionForm({ initialData, onSubmit, onCancel, isSubm
                         required={formData?.type === "ChromaCloud"}
                       />
                     </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="WeaviateCloud" className="mt-0 space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="weaviateURL">Weaviate URL *</Label>
+                    <Input
+                      id="weaviateURL"
+                      name="weaviateURL"
+                      value={(formData as unknown as IWeaviateCloudConnectionFlatItem)?.weaviateURL || ""}
+                      onChange={handleInputChange}
+                      required={formData?.type === "WeaviateCloud"}
+                      placeholder="https://your-cluster.weaviate.cloud"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="weaviateApiKey">API Key *</Label>
+                    <Input
+                      id="weaviateApiKey"
+                      type="password"
+                      name="weaviateApiKey"
+                      value={(formData as unknown as IWeaviateCloudConnectionFlatItem)?.weaviateApiKey || ""}
+                      onChange={handleInputChange}
+                      required={formData?.type === "WeaviateCloud"}
+                    />
                   </div>
                 </TabsContent>
               </div>

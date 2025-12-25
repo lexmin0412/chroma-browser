@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { Loader2, Plus, AlertCircle } from 'lucide-react';
 import { chromaService } from "@/app/utils/chroma-service";
-import { IConnectionFlatItem, IConnectionItem, IChromaNormalConnectionFlatItem, IChromaCloudConnectionFlatItem } from "@/types";
+import { IConnectionFlatItem, IConnectionItem, IChromaNormalConnectionFlatItem, IChromaCloudConnectionFlatItem, IWeaviateCloudConnectionFlatItem } from "@/types";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -28,17 +28,17 @@ export default function ConnectionManagementDrawer({ open, onOpenChange, onConne
   const [editingConnection, setEditingConnection] = useState<IConnectionItem | null>(null);
   const [editingFormData, setEditingFormData] = useState<Partial<IConnectionFlatItem>>();
 
-  // Fetch connections
   const fetchConnections = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const response = await fetch("/api/connections");
       if (!response.ok) throw new Error("Failed to fetch connections");
       const data = await response.json();
       setConnections(data);
     } catch (err) {
-      setError("Failed to load connections");
       console.error(err);
+      setError("Failed to load connections");
     } finally {
       setIsLoading(false);
     }
@@ -59,19 +59,33 @@ export default function ConnectionManagementDrawer({ open, onOpenChange, onConne
   const handleEditConnection = (connection: IConnectionItem) => {
     setEditingConnection(connection);
     // Flatten data for form
-    const flatData: Partial<IConnectionFlatItem> = {
+    let flatData: Partial<IConnectionFlatItem> = {
       name: connection.name,
       type: connection.type,
       description: connection.description,
-      ...(connection.type === "ChromaNormal" ? {
+    };
+
+    if (connection.type === "ChromaNormal") {
+      flatData = {
+        ...flatData,
         host: connection.config.host,
         port: connection.config.port,
-      } : {
+      };
+    } else if (connection.type === "ChromaCloud") {
+      flatData = {
+        ...flatData,
         apiKey: connection.config.apiKey,
         tenant: connection.config.tenant,
         database: connection.config.database,
-      })
-    };
+      };
+    } else if (connection.type === "WeaviateCloud") {
+      flatData = {
+        ...flatData,
+        weaviateURL: connection.config.weaviateURL,
+        weaviateApiKey: connection.config.weaviateApiKey,
+      };
+    }
+
     setEditingFormData(flatData);
     setIsFormOpen(true);
   };
@@ -95,9 +109,12 @@ export default function ConnectionManagementDrawer({ open, onOpenChange, onConne
           if (formData.type === "ChromaNormal") {
             const normal = formData as unknown as Omit<IChromaNormalConnectionFlatItem, "id">;
             Object.assign(config, { host: normal.host, port: normal.port });
-          } else {
+          } else if (formData.type === "ChromaCloud") {
             const cloud = formData as unknown as Omit<IChromaCloudConnectionFlatItem, "id">;
             Object.assign(config, { apiKey: cloud.apiKey, tenant: cloud.tenant, database: cloud.database });
+          } else if (formData.type === "WeaviateCloud") {
+            const weaviate = formData as unknown as Omit<IWeaviateCloudConnectionFlatItem, "id">;
+            Object.assign(config, { weaviateURL: weaviate.weaviateURL, weaviateApiKey: weaviate.weaviateApiKey });
           }
 
           const connectionData = {

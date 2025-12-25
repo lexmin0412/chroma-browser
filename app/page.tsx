@@ -4,42 +4,35 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-	Empty,
-	EmptyHeader,
-	EmptyTitle,
-	EmptyDescription,
-	EmptyMedia,
-	EmptyContent,
-} from "@/components/ui/empty";
 import ConnectionList from "@/components/ConnectionList";
 import ConnectionFormDrawer from "@/components/ConnectionFormDrawer";
-import { IConnectionItem, IConnectionFlatItem, IChromaNormalConnectionFlatItem, IChromaCloudConnectionFlatItem } from "@/types";
+import {
+	IConnectionItem,
+	IConnectionFlatItem,
+	IChromaNormalConnectionFlatItem,
+	IChromaCloudConnectionFlatItem,
+	IWeaviateCloudConnectionFlatItem
+} from "@/types";
 import { chromaService } from "@/app/utils/chroma-service";
 import Image from "next/image";
 
-export default function HomePage() {
+export default function Home() {
 	const router = useRouter();
 	const [connections, setConnections] = useState<IConnectionItem[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-
-	// Drawer states
 	const [isFormOpen, setIsFormOpen] = useState(false);
-	const [editingConnection, setEditingConnection] =
-		useState<IConnectionItem | null>(null);
-	const [editingFormData, setEditingFormData] =
-		useState<Partial<IConnectionFlatItem>>();
+	const [editingConnection, setEditingConnection] = useState<IConnectionItem | null>(null);
+	const [editingFormData, setEditingFormData] = useState<Partial<IConnectionFlatItem>>();
 
 	const fetchConnections = async () => {
 		try {
 			setIsLoading(true);
 			const response = await fetch("/api/connections");
-			if (response.ok) {
-				const data = await response.json();
-				setConnections(data);
-			}
-		} catch (error) {
-			console.error("Failed to fetch connections", error);
+			if (!response.ok) throw new Error("Failed to fetch connections");
+			const data = await response.json();
+			setConnections(data);
+		} catch (err) {
+			console.error(err);
 		} finally {
 			setIsLoading(false);
 		}
@@ -62,21 +55,33 @@ export default function HomePage() {
 
 	const handleEditConnection = (connection: IConnectionItem) => {
 		setEditingConnection(connection);
-		const flatData: Partial<IConnectionFlatItem> = {
+		let flatData: Partial<IConnectionFlatItem> = {
 			name: connection.name,
 			type: connection.type,
 			description: connection.description,
-			...(connection.type === "ChromaNormal"
-				? {
-						host: connection.config.host,
-						port: connection.config.port,
-				  }
-				: {
-						apiKey: connection.config.apiKey,
-						tenant: connection.config.tenant,
-						database: connection.config.database,
-				  }),
 		};
+
+		if (connection.type === "ChromaNormal") {
+			flatData = {
+				...flatData,
+				host: connection.config.host,
+				port: connection.config.port,
+			};
+		} else if (connection.type === "ChromaCloud") {
+			flatData = {
+				...flatData,
+				apiKey: connection.config.apiKey,
+				tenant: connection.config.tenant,
+				database: connection.config.database,
+			};
+		} else if (connection.type === "WeaviateCloud") {
+			flatData = {
+				...flatData,
+				weaviateURL: connection.config.weaviateURL,
+				weaviateApiKey: connection.config.weaviateApiKey,
+			};
+		}
+
 		setEditingFormData(flatData);
 		setIsFormOpen(true);
 	};
@@ -102,12 +107,18 @@ export default function HomePage() {
 			if (formData.type === "ChromaNormal") {
 				const normal = formData as unknown as Omit<IChromaNormalConnectionFlatItem, "id">;
 				Object.assign(config, { host: normal.host, port: normal.port });
-			} else {
+			} else if (formData.type === "ChromaCloud") {
 				const cloud = formData as unknown as Omit<IChromaCloudConnectionFlatItem, "id">;
 				Object.assign(config, {
 					apiKey: cloud.apiKey,
 					tenant: cloud.tenant,
 					database: cloud.database,
+				});
+			} else if (formData.type === "WeaviateCloud") {
+				const weaviate = formData as unknown as Omit<IWeaviateCloudConnectionFlatItem, "id">;
+				Object.assign(config, {
+					weaviateURL: weaviate.weaviateURL,
+					weaviateApiKey: weaviate.weaviateApiKey,
 				});
 			}
 
@@ -158,41 +169,26 @@ export default function HomePage() {
 				<h1 className="text-4xl font-bold text-foreground">
 					Vector DB Browser
 				</h1>
+				<p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+					A modern, open-source browser interface for your Vector Databases.
+					Connect, explore, and manage your vector collections with ease.
+				</p>
 			</div>
 
 			{isLoading ? (
-				<div className="flex justify-center items-center py-12">
-					<Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+				<div className="flex justify-center p-12">
+					<Loader2 className="h-8 w-8 animate-spin text-primary" />
 				</div>
-			) : connections.length === 0 ? (
-				<Empty>
-					<EmptyHeader>
-						<EmptyMedia variant="icon">
-							<Database className="w-12 h-12 text-muted-foreground" />
-						</EmptyMedia>
-						<EmptyTitle>No Connections Found</EmptyTitle>
-						<EmptyDescription>
-							Configure a connection to your ChromaDB instance to get started.
-						</EmptyDescription>
-					</EmptyHeader>
-					<EmptyContent>
-						<Button onClick={handleAddConnection}>
-							<Plus className="mr-2 h-4 w-4" />
-							Add Connection
-						</Button>
-					</EmptyContent>
-				</Empty>
 			) : (
 				<div className="space-y-6">
 					<div className="flex justify-between items-center">
-						<h2 className="text-2xl font-semibold tracking-tight">
-							Your Connections
-						</h2>
-						<Button onClick={handleAddConnection}>
-							<Plus className="mr-2 h-4 w-4" />
-							Add Connection
+						<h2 className="text-2xl font-semibold tracking-tight">Your Connections</h2>
+						<Button onClick={handleAddConnection} size="lg" className="gap-2">
+							<Plus className="h-5 w-5" />
+							New Connection
 						</Button>
 					</div>
+
 					<ConnectionList
 						connections={connections}
 						onLaunch={handleLaunch}

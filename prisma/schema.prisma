@@ -28,4 +28,5 @@ model Connection {
 enum ConnectionType {
   ChromaNormal
   ChromaCloud
+  WeaviateCloud
 }

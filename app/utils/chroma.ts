@@ -1,11 +1,12 @@
 import { ChromaClient, CloudClient } from "chromadb";
+import weaviate, { ApiKey } from 'weaviate-client';
 import { IConnectionItem } from "@/types";
 
 // 连接类型定义
-export type ConnectionType = "ChromaNormal" | "ChromaCloud";
+export type ConnectionType = "ChromaNormal" | "ChromaCloud" | "WeaviateCloud";
 
-// 创建 ChromaClient 实例
-export const getClient = (connection: IConnectionItem) => {
+// 创建 Client 实例
+export const getClient = async (connection: IConnectionItem) => {
 	if (!connection.config) {
 		throw new Error(`Connection config is required for ${connection.type} connection`);
 	}
@@ -24,6 +25,14 @@ export const getClient = (connection: IConnectionItem) => {
 				tenant: connection.config.tenant as string,
 				database: connection.config.database as string,
 			});
+		case "WeaviateCloud":
+			// Weaviate Cloud 连接
+			return await weaviate.connectToWeaviateCloud(
+				connection.config.weaviateURL as string,
+				{
+					authCredentials: new ApiKey(connection.config.weaviateApiKey as string),
+				}
+			);
 		default:
 			throw new Error(`Unsupported connection type: ${(connection as Record<string, string>).type}`);
 	}
