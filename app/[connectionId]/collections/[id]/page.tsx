@@ -191,46 +191,49 @@ export default function CollectionDetailPage({
 
 	return (
 		<div className="w-full h-full flex flex-col p-4 space-y-4">
-			<div className="flex items-center gap-2 group shrink-0">
-				<Icon
-					icon="heroicons:rectangle-stack"
-					className="w-5 h-5 text-slate-500"
-				/>
-				<h3 className="text-base font-semibold">{collectionName}</h3>
-				<button
-					type="button"
-					aria-label="Copy collection name"
-					title="复制集合名称"
-					onClick={async () => {
-						try {
-							await navigator.clipboard.writeText(collectionName);
-							setCopied(true);
-							setTimeout(() => setCopied(false), 1200);
-						} catch {}
-					}}
-					className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-				>
-					<Icon
-						icon={copied ? "heroicons:check" : "heroicons:clipboard-document"}
-						className={`w-4 h-4 ${
-							copied
-								? "text-green-600"
-								: "text-slate-400 group-hover:text-slate-600"
-						}`}
-					/>
-				</button>
-			</div>
-
 			<Tabs
 				value={activeTab}
 				onValueChange={setActiveTab}
 				className="w-full flex-1 flex flex-col overflow-hidden min-h-0"
 			>
-				<TabsList className="shrink-0">
-					<TabsTrigger value="view">View</TabsTrigger>
-					<TabsTrigger value="query">Query</TabsTrigger>
-					<TabsTrigger value="settings">Settings</TabsTrigger>
-				</TabsList>
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2 group shrink-0">
+						<Icon
+							icon="heroicons:rectangle-stack"
+							className="w-5 h-5 text-slate-500"
+						/>
+						<h3 className="text-base font-semibold">{collectionName}</h3>
+						<button
+							type="button"
+							aria-label="Copy collection name"
+							title="复制集合名称"
+							onClick={async () => {
+								try {
+									await navigator.clipboard.writeText(collectionName);
+									setCopied(true);
+									setTimeout(() => setCopied(false), 1200);
+								} catch {}
+							}}
+							className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+						>
+							<Icon
+								icon={
+									copied ? "heroicons:check" : "heroicons:clipboard-document"
+								}
+								className={`w-4 h-4 ${
+									copied
+										? "text-green-600"
+										: "text-slate-400 group-hover:text-slate-600"
+								}`}
+							/>
+						</button>
+					</div>
+					<TabsList className="shrink-0">
+						<TabsTrigger value="view">View</TabsTrigger>
+						<TabsTrigger value="query">Query</TabsTrigger>
+						<TabsTrigger value="settings">Settings</TabsTrigger>
+					</TabsList>
+				</div>
 				<TabsContent
 					value="view"
 					className="flex-1 overflow-hidden data-[state=active]:flex flex-col mt-2"
@@ -239,11 +242,11 @@ export default function CollectionDetailPage({
 						<div className="text-red-500 mb-4">{error}</div>
 					) : (
 						<div className="w-full overflow-hidden rounded-md relative flex flex-col flex-1 min-h-0">
-              {loading && (
-                <div className="absolute inset-0 bg-white/50 dark:bg-black/50 z-50 flex items-center justify-center backdrop-blur-[1px]">
-                  <LoadingSpinner />
-                </div>
-              )}
+							{loading && (
+								<div className="absolute inset-0 bg-white/50 dark:bg-black/50 z-50 flex items-center justify-center backdrop-blur-[1px]">
+									<LoadingSpinner />
+								</div>
+							)}
 							<Table
 								containerClassName="overflow-auto min-h-0"
 								className="w-full [&_td]:border-r [&_th]:border-r [&_td:last-child]:border-r-0 [&_th:last-child]:border-r-0"
