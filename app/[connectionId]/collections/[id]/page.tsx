@@ -17,8 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Spinner } from "@/components/ui/spinner";
 import {
 	Sheet,
 	SheetContent,
@@ -31,6 +29,7 @@ import { toast } from "sonner";
 import CollectionDetailQuery from "./query";
 import { useCollectionsContext } from "../layout";
 import CollectionForm from "@/components/CollectionForm";
+import { RecordSheet, RecordFormData } from "./record-sheet";
 
 export default function CollectionDetailPage({
 	params: routeParams,
@@ -68,9 +67,8 @@ export default function CollectionDetailPage({
 
 	// CRUD States
 	const [operating, setOperating] = useState(false);
-	const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
-	const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
-	const [recordForm, setRecordForm] = useState({
+	const [sheetMode, setSheetMode] = useState<"add" | "edit" | null>(null);
+	const [sheetInitialData, setSheetInitialData] = useState<RecordFormData>({
 		id: "",
 		document: "",
 		metadata: "{}",
@@ -230,10 +228,10 @@ export default function CollectionDetailPage({
 		}
 	};
 
-	const handleAddRecord = async () => {
+	const handleAddRecord = async (data: RecordFormData) => {
 		try {
 			setOperating(true);
-			const { id, document, metadata, embedding } = recordForm;
+			const { id, document, metadata, embedding } = data;
 
 			if (!id) throw new Error("ID is required");
 
@@ -262,8 +260,7 @@ export default function CollectionDetailPage({
 
 			await chromaService.addRecords(collectionName, params);
 			toast.success(`Record "${id}" added successfully.`);
-			setIsAddSheetOpen(false);
-			setRecordForm({ id: "", document: "", metadata: "{}", embedding: "" });
+			setSheetMode(null);
 			// Refresh list
 			getRecords();
 			fetchRecordCount();
@@ -278,14 +275,10 @@ export default function CollectionDetailPage({
 		if (!records || !records.ids) return;
 
 		const idVal = records.ids[index];
-		const id = Array.isArray(idVal)
-			? idVal.join("-")
-			: (idVal as string);
+		const id = Array.isArray(idVal) ? idVal.join("-") : (idVal as string);
 
 		const docVal = records.documents?.[index];
-		const document = Array.isArray(docVal)
-			? (docVal[0] || "")
-			: (docVal || "");
+		const document = Array.isArray(docVal) ? docVal[0] || "" : docVal || "";
 
 		const metaVal = records.metadatas?.[index];
 		let metadata = "{}";
@@ -301,21 +294,25 @@ export default function CollectionDetailPage({
 		let embedding = "";
 		if (embVal) {
 			// Check if it's number[][] (QueryResult) or number[] (GetResult)
-			if (Array.isArray(embVal) && embVal.length > 0 && Array.isArray(embVal[0])) {
+			if (
+				Array.isArray(embVal) &&
+				embVal.length > 0 &&
+				Array.isArray(embVal[0])
+			) {
 				embedding = JSON.stringify(embVal[0]);
 			} else {
 				embedding = JSON.stringify(embVal);
 			}
 		}
 
-		setRecordForm({ id, document, metadata, embedding });
-		setIsEditSheetOpen(true);
+		setSheetInitialData({ id, document, metadata, embedding });
+		setSheetMode("edit");
 	};
 
-	const handleUpdateRecord = async () => {
+	const handleUpdateRecord = async (data: RecordFormData) => {
 		try {
 			setOperating(true);
-			const { id, document, metadata, embedding } = recordForm;
+			const { id, document, metadata, embedding } = data;
 
 			if (!id) throw new Error("ID is required");
 
@@ -344,7 +341,7 @@ export default function CollectionDetailPage({
 
 			await chromaService.updateRecords(collectionName, params);
 			toast.success(`Record "${id}" updated successfully.`);
-			setIsEditSheetOpen(false);
+			setSheetMode(null);
 			// Refresh list
 			getRecords();
 		} catch (err) {
@@ -362,7 +359,7 @@ export default function CollectionDetailPage({
 				className="w-full flex-1 flex flex-col overflow-hidden min-h-0"
 			>
 				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2 group shrink-0">
+					<div className="flex items-center gap-2 group shrink-0 flex-1">
 						<Icon
 							icon="heroicons:rectangle-stack"
 							className="w-5 h-5 text-slate-500"
@@ -393,11 +390,32 @@ export default function CollectionDetailPage({
 							/>
 						</button>
 					</div>
-					<TabsList className="shrink-0">
-						<TabsTrigger value="view">View</TabsTrigger>
-						<TabsTrigger value="query">Query</TabsTrigger>
-						<TabsTrigger value="settings">Settings</TabsTrigger>
-					</TabsList>
+					<div className="flex-1 flex justify-center">
+						<TabsList className="shrink-0">
+							<TabsTrigger value="view">View</TabsTrigger>
+							<TabsTrigger value="query">Query</TabsTrigger>
+							<TabsTrigger value="settings">Settings</TabsTrigger>
+						</TabsList>
+					</div>
+					<div className="flex-1 flex justify-end">
+						{activeTab === "view" && (
+							<Button
+								size="sm"
+								onClick={() => {
+									setSheetInitialData({
+										id: "",
+										document: "",
+										metadata: "{}",
+										embedding: "",
+									});
+									setSheetMode("add");
+								}}
+							>
+								<Icon icon="heroicons:plus" className="w-4 h-4 mr-1" />
+								Add Record
+							</Button>
+						)}
+					</div>
 				</div>
 				<TabsContent
 					value="view"
@@ -405,29 +423,39 @@ export default function CollectionDetailPage({
 				>
 					<div className="bg-white dark:bg-slate-900 p-3 border-b border-slate-200 dark:border-slate-800 mb-2 grid grid-cols-1 md:grid-cols-3 gap-4 rounded-md">
 						<div className="space-y-1">
-							<Label htmlFor="filter-ids" className="text-xs">IDs</Label>
+							<Label htmlFor="filter-ids" className="text-xs">
+								IDs
+							</Label>
 							<Input
 								id="filter-ids"
 								placeholder="id1, id2, ..."
 								value={filters.ids}
-								onChange={(e) => setFilters({ ...filters, ids: e.target.value })}
+								onChange={(e) =>
+									setFilters({ ...filters, ids: e.target.value })
+								}
 								onKeyDown={(e) => e.key === "Enter" && getRecords(1)}
 								className="h-8 text-sm"
 							/>
 						</div>
 						<div className="space-y-1">
-							<Label htmlFor="filter-where" className="text-xs">Where (JSON)</Label>
+							<Label htmlFor="filter-where" className="text-xs">
+								Where (JSON)
+							</Label>
 							<Input
 								id="filter-where"
 								placeholder='{"key": "value"}'
 								value={filters.where}
-								onChange={(e) => setFilters({ ...filters, where: e.target.value })}
+								onChange={(e) =>
+									setFilters({ ...filters, where: e.target.value })
+								}
 								onKeyDown={(e) => e.key === "Enter" && getRecords(1)}
 								className="h-8 text-sm"
 							/>
 						</div>
 						<div className="space-y-1">
-							<Label htmlFor="filter-where-doc" className="text-xs">Where Document (JSON)</Label>
+							<Label htmlFor="filter-where-doc" className="text-xs">
+								Where Document (JSON)
+							</Label>
 							<Input
 								id="filter-where-doc"
 								placeholder='{"$contains": "text"}'
@@ -447,204 +475,183 @@ export default function CollectionDetailPage({
 								<LoadingSpinner />
 							</div>
 						)}
-						<div className="flex justify-end mb-2 px-1">
-							<Button
-								size="sm"
-								onClick={() => {
-									setRecordForm({
-										id: "",
-										document: "",
-										metadata: "{}",
-										embedding: "",
-									});
-									setIsAddSheetOpen(true);
-								}}
-							>
-								<Icon icon="heroicons:plus" className="w-4 h-4 mr-1" />
-								Add Record
-							</Button>
-						</div>
-							<Table
-								containerClassName="overflow-auto min-h-0"
-								className="w-full [&_td]:border-r [&_th]:border-r [&_td:last-child]:border-r-0 [&_th:last-child]:border-r-0"
-							>
-								<TableHeader className="sticky top-0 bg-slate-50 dark:bg-slate-950 z-10 shadow-sm">
-									<TableRow className="hover:bg-transparent">
-										<TableHead>ID</TableHead>
-										<TableHead>Document</TableHead>
-										<TableHead>Metadata</TableHead>
-										<TableHead>Embeddings</TableHead>
-										<TableHead className="w-[100px]">Actions</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{records && records.ids && records.ids.length > 0 ? (
-										records.ids.map((id, index) => (
-											<TableRow
-												key={Array.isArray(id) ? id.join("-") : id}
-												className="cursor-pointer transition-colors group even:bg-slate-50 dark:even:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/60"
-												onClick={() => setSelectedRecordIndex(index)}
-											>
-												<TableCell className="font-medium">
-													<div className="flex items-center gap-2">
-														{Array.isArray(id) ? id.join(", ") : id}
-														<Icon
-															icon="heroicons:chevron-right"
-															className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-all transform translate-x-0 group-hover:translate-x-1"
-														/>
+						<Table
+							containerClassName="overflow-auto min-h-0"
+							className="w-full [&_td]:border-r [&_th]:border-r [&_td:last-child]:border-r-0 [&_th:last-child]:border-r-0"
+						>
+							<TableHeader className="sticky top-0 bg-slate-50 dark:bg-slate-950 z-30 shadow-sm">
+								<TableRow className="hover:bg-transparent">
+									<TableHead>ID</TableHead>
+									<TableHead>Document</TableHead>
+									<TableHead>Metadata</TableHead>
+									<TableHead>Embeddings</TableHead>
+									<TableHead className="w-[100px] sticky right-0 z-20 bg-slate-50 dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800">
+										Actions
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{records && records.ids && records.ids.length > 0 ? (
+									records.ids.map((id, index) => (
+										<TableRow
+											key={Array.isArray(id) ? id.join("-") : id}
+											className="cursor-pointer transition-colors group even:bg-slate-50 dark:even:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/60"
+											onClick={() => setSelectedRecordIndex(index)}
+										>
+											<TableCell className="font-medium">
+												<div className="flex items-center gap-2">
+													{Array.isArray(id) ? id.join(", ") : id}
+													<Icon
+														icon="heroicons:chevron-right"
+														className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-all transform translate-x-0 group-hover:translate-x-1"
+													/>
+												</div>
+											</TableCell>
+											<TableCell>
+												{records.documents && records.documents[index] ? (
+													<div className="max-w-xs truncate text-slate-600 dark:text-slate-400">
+														{records.documents[index]}
 													</div>
-												</TableCell>
-												<TableCell>
-													{records.documents && records.documents[index] ? (
-														<div className="max-w-xs truncate text-slate-600 dark:text-slate-400">
-															{records.documents[index]}
-														</div>
-													) : (
-														<span className="text-muted-foreground">-</span>
-													)}
-												</TableCell>
-												<TableCell>
-													{records.metadatas && records.metadatas[index] ? (
-														<div className="truncate max-w-[200px] text-sm text-slate-600 dark:text-slate-400 font-mono">
-															{JSON.stringify(records.metadatas[index])}
-														</div>
-													) : (
-														<span className="text-muted-foreground">-</span>
-													)}
-												</TableCell>
-												<TableCell>
-													{records.embeddings && records.embeddings[index] ? (
-														<div className="max-w-xs truncate text-slate-600 dark:text-slate-400">
-															[
-															{records.embeddings[index].slice(0, 3).join(", ")}
-															...]
-														</div>
-													) : (
-														<span className="text-muted-foreground">-</span>
-													)}
-												</TableCell>
-												<TableCell>
-													<div
-														className="flex items-center gap-2"
-														onClick={(e) => e.stopPropagation()}
+												) : (
+													<span className="text-muted-foreground">-</span>
+												)}
+											</TableCell>
+											<TableCell>
+												{records.metadatas && records.metadatas[index] ? (
+													<div className="truncate max-w-[200px] text-sm text-slate-600 dark:text-slate-400 font-mono">
+														{JSON.stringify(records.metadatas[index])}
+													</div>
+												) : (
+													<span className="text-muted-foreground">-</span>
+												)}
+											</TableCell>
+											<TableCell>
+												{records.embeddings && records.embeddings[index] ? (
+													<div className="max-w-xs truncate text-slate-600 dark:text-slate-400">
+														[{records.embeddings[index].slice(0, 3).join(", ")}
+														...]
+													</div>
+												) : (
+													<span className="text-muted-foreground">-</span>
+												)}
+											</TableCell>
+											<TableCell className="w-[100px] sticky right-0 z-20 bg-slate-50 dark:bg-slate-950 group-hover:bg-slate-100 dark:group-hover:bg-slate-900 border-l border-slate-200 dark:border-slate-800">
+												<div
+													className="flex items-center gap-2"
+													onClick={(e) => e.stopPropagation()}
+												>
+													<Button
+														variant="ghost"
+														size="icon-sm"
+														onClick={() => openEditDialog(index)}
 													>
-														<Button
-															variant="ghost"
-															size="icon-sm"
-															onClick={() => openEditDialog(index)}
-														>
-															<Icon
-																icon="heroicons:pencil-square"
-																className="w-4 h-4 text-slate-500"
-															/>
-														</Button>
-														<Button
-															variant="ghost"
-															size="icon-sm"
-															className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-															onClick={() => {
-																const id = Array.isArray(records.ids[index])
-																	? records.ids[index].join("-")
-																	: (records.ids[index] as string);
-																handleDeleteRecord(id);
-															}}
-														>
-															<Icon icon="heroicons:trash" className="w-4 h-4" />
-														</Button>
-													</div>
-												</TableCell>
-											</TableRow>
-										))
-									) : (
-										<TableRow>
-											<TableCell colSpan={5} className="h-24 text-center">
-												No records found.
+														<Icon
+															icon="heroicons:pencil-square"
+															className="w-4 h-4 text-slate-500"
+														/>
+													</Button>
+													<Button
+														variant="ghost"
+														size="icon-sm"
+														className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+														onClick={() => {
+															const id = Array.isArray(records.ids[index])
+																? records.ids[index].join("-")
+																: (records.ids[index] as string);
+															handleDeleteRecord(id);
+														}}
+													>
+														<Icon icon="heroicons:trash" className="w-4 h-4" />
+													</Button>
+												</div>
 											</TableCell>
 										</TableRow>
-									)}
-								</TableBody>
-							</Table>
-							<div className="flex items-center justify-between mt-2 p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-800">
-								<div className="flex items-center gap-4 text-sm text-muted-foreground">
-									<div className="flex items-center gap-2 font-medium">
-										<Icon icon="heroicons:circle-stack" className="w-4 h-4" />
-										<span>Total {recordCount} records</span>
-									</div>
+									))
+								) : (
+									<TableRow>
+										<TableCell colSpan={5} className="h-24 text-center">
+											No records found.
+										</TableCell>
+									</TableRow>
+								)}
+							</TableBody>
+						</Table>
+						<div className="flex items-center justify-between mt-2 p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-800">
+							<div className="flex items-center gap-4 text-sm text-muted-foreground">
+								<div className="flex items-center gap-2 font-medium">
+									<Icon icon="heroicons:circle-stack" className="w-4 h-4" />
+									<span>Total {recordCount} records</span>
 								</div>
-								<div className="flex items-center gap-6 lg:gap-8">
-									<div className="flex items-center space-x-2">
-										<span className="text-sm text-muted-foreground">
-											Rows per page
-										</span>
-										<select
-											className="h-8 w-[70px] rounded-md border border-input bg-background px-2 py-1 text-xs font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-											value={filters.limit}
-											onChange={(e) => {
-												const newLimit = e.target.value;
-												setFilters({ ...filters, limit: newLimit });
-												setCurrentPage(1);
-												getRecords(1);
-											}}
-										>
-											<option value="10">10</option>
-											<option value="20">20</option>
-											<option value="50">50</option>
-											<option value="100">100</option>
-										</select>
+							</div>
+							<div className="flex items-center gap-6 lg:gap-8">
+								<div className="flex items-center space-x-2">
+									<span className="text-sm text-muted-foreground">
+										Rows per page
+									</span>
+									<select
+										className="h-8 w-[70px] rounded-md border border-input bg-background px-2 py-1 text-xs font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+										value={filters.limit}
+										onChange={(e) => {
+											const newLimit = e.target.value;
+											setFilters({ ...filters, limit: newLimit });
+											setCurrentPage(1);
+											getRecords(1);
+										}}
+									>
+										<option value="10">10</option>
+										<option value="20">20</option>
+										<option value="50">50</option>
+										<option value="100">100</option>
+									</select>
+								</div>
+								<div className="flex items-center space-x-2">
+									<Button
+										variant="outline"
+										size="icon-sm"
+										disabled={currentPage <= 1 || loading}
+										onClick={() => {
+											const next = Math.max(1, currentPage - 1);
+											setCurrentPage(next);
+											getRecords(next);
+										}}
+									>
+										<Icon icon="heroicons:chevron-left" className="h-4 w-4" />
+										<span className="sr-only">Previous page</span>
+									</Button>
+									<div className="flex px-2 items-center justify-center text-sm font-medium">
+										{currentPage}
 									</div>
-									<div className="flex items-center space-x-2">
-										<Button
-											variant="outline"
-											size="icon-sm"
-											disabled={currentPage <= 1 || loading}
-											onClick={() => {
-												const next = Math.max(1, currentPage - 1);
-												setCurrentPage(next);
-												getRecords(next);
-											}}
-										>
-											<Icon icon="heroicons:chevron-left" className="h-4 w-4" />
-											<span className="sr-only">Previous page</span>
-										</Button>
-										<div className="flex px-2 items-center justify-center text-sm font-medium">
-											{currentPage}
-										</div>
-										<Button
-											variant="outline"
-											size="icon-sm"
-											disabled={
-												currentPage >=
-													Math.max(
-														1,
-														Math.ceil(
-															(recordCount || 0) /
-																(parseInt(filters.limit) || 10)
-														)
-													) || loading
-											}
-											onClick={() => {
-												const total = Math.max(
+									<Button
+										variant="outline"
+										size="icon-sm"
+										disabled={
+											currentPage >=
+												Math.max(
 													1,
 													Math.ceil(
-														(recordCount || 0) /
-															(parseInt(filters.limit) || 10)
+														(recordCount || 0) / (parseInt(filters.limit) || 10)
 													)
-												);
-												const next = Math.min(total, currentPage + 1);
-												setCurrentPage(next);
-												getRecords(next);
-											}}
-										>
-											<Icon
-												icon="heroicons:chevron-right"
-												className="h-4 w-4"
-											/>
-											<span className="sr-only">Next page</span>
-										</Button>
-									</div>
+												) || loading
+										}
+										onClick={() => {
+											const total = Math.max(
+												1,
+												Math.ceil(
+													(recordCount || 0) / (parseInt(filters.limit) || 10)
+												)
+											);
+											const next = Math.min(total, currentPage + 1);
+											setCurrentPage(next);
+											getRecords(next);
+										}}
+									>
+										<Icon icon="heroicons:chevron-right" className="h-4 w-4" />
+										<span className="sr-only">Next page</span>
+									</Button>
 								</div>
 							</div>
 						</div>
+					</div>
 				</TabsContent>
 				<TabsContent
 					value="query"
@@ -657,7 +664,7 @@ export default function CollectionDetailPage({
 					value="settings"
 					className="flex-1 overflow-auto data-[state=active]:block mt-2 p-2"
 				>
-					<div className="max-w-2xl">
+					<div className="max-w-2xl mx-auto">
 						<CollectionForm
 							initialName={collectionName}
 							initialMetadata={collectionMetadata ?? undefined}
@@ -848,149 +855,21 @@ export default function CollectionDetailPage({
 				</SheetContent>
 			</Sheet>
 
-			{/* Add Record Sheet */}
-			<Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
-				<SheetContent className="w-[600px] sm:w-[800px] overflow-y-auto">
-					<SheetHeader>
-						<SheetTitle>Add New Record</SheetTitle>
-						<SheetDescription>
-							Add a new record to this collection. ID is required.
-						</SheetDescription>
-					</SheetHeader>
-					<div className="grid gap-4 p-4">
-						<div className="grid gap-2">
-							<Label htmlFor="id">ID</Label>
-							<Input
-								id="id"
-								value={recordForm.id}
-								onChange={(e) =>
-									setRecordForm({ ...recordForm, id: e.target.value })
-								}
-								placeholder="Record ID"
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="document">Document Content</Label>
-							<Textarea
-								id="document"
-								value={recordForm.document}
-								onChange={(e) =>
-									setRecordForm({ ...recordForm, document: e.target.value })
-								}
-								placeholder="Document text content..."
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="metadata">Metadata (JSON)</Label>
-							<Textarea
-								id="metadata"
-								value={recordForm.metadata}
-								onChange={(e) =>
-									setRecordForm({ ...recordForm, metadata: e.target.value })
-								}
-								placeholder='{"key": "value"}'
-								className="font-mono text-xs"
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="embedding">Embedding (JSON Array)</Label>
-							<Textarea
-								id="embedding"
-								value={recordForm.embedding}
-								onChange={(e) =>
-									setRecordForm({ ...recordForm, embedding: e.target.value })
-								}
-								placeholder="[0.1, 0.2, ...]"
-								className="font-mono text-xs"
-							/>
-						</div>
-					</div>
-					<div className="flex justify-end gap-2 mt-4 px-4">
-						<Button
-							variant="outline"
-							onClick={() => setIsAddSheetOpen(false)}
-							disabled={operating}
-						>
-							Cancel
-						</Button>
-						<Button onClick={handleAddRecord} disabled={operating}>
-							{operating && <Spinner className="mr-2 h-4 w-4" />}
-							Add Record
-						</Button>
-					</div>
-				</SheetContent>
-			</Sheet>
-
-			{/* Edit Record Sheet */}
-			<Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
-				<SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-					<SheetHeader>
-						<SheetTitle>Edit Record</SheetTitle>
-						<SheetDescription>
-							Update record details. ID cannot be changed here.
-						</SheetDescription>
-					</SheetHeader>
-					<div className="grid gap-4 py-4">
-						<div className="grid gap-2">
-							<Label htmlFor="edit-id">ID</Label>
-							<Input
-								id="edit-id"
-								value={recordForm.id}
-								disabled
-								className="bg-slate-100 dark:bg-slate-800"
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="edit-document">Document Content</Label>
-							<Textarea
-								id="edit-document"
-								value={recordForm.document}
-								onChange={(e) =>
-									setRecordForm({ ...recordForm, document: e.target.value })
-								}
-								placeholder="Document text content..."
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="edit-metadata">Metadata (JSON)</Label>
-							<Textarea
-								id="edit-metadata"
-								value={recordForm.metadata}
-								onChange={(e) =>
-									setRecordForm({ ...recordForm, metadata: e.target.value })
-								}
-								placeholder='{"key": "value"}'
-								className="font-mono text-xs"
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="edit-embedding">Embedding (JSON Array)</Label>
-							<Textarea
-								id="edit-embedding"
-								value={recordForm.embedding}
-								onChange={(e) =>
-									setRecordForm({ ...recordForm, embedding: e.target.value })
-								}
-								placeholder="[0.1, 0.2, ...]"
-								className="font-mono text-xs"
-							/>
-						</div>
-					</div>
-					<div className="flex justify-end gap-2 mt-4">
-						<Button
-							variant="outline"
-							onClick={() => setIsEditSheetOpen(false)}
-							disabled={operating}
-						>
-							Cancel
-						</Button>
-						<Button onClick={handleUpdateRecord} disabled={operating}>
-							{operating && <Spinner className="mr-2 h-4 w-4" />}
-							Update Record
-						</Button>
-					</div>
-				</SheetContent>
-			</Sheet>
+			{/* Unified Record Sheet */}
+			<RecordSheet
+				open={sheetMode !== null}
+				onOpenChange={(open) => !open && setSheetMode(null)}
+				mode={sheetMode || "add"}
+				initialData={sheetInitialData}
+				onSubmit={async (data) => {
+					if (sheetMode === "add") {
+						await handleAddRecord(data);
+					} else {
+						await handleUpdateRecord(data);
+					}
+				}}
+				operating={operating}
+			/>
 		</div>
 	);
 }
